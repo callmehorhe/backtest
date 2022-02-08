@@ -23,14 +23,24 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 type data struct {
-	email    string `json:"email"`
-	password string `json:"password"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
 }
 
 func (h *Handler) signIn(c *gin.Context) {
 	var input data
 
 	if err := c.BindJSON(&input); err != nil {
-		
+		newErrorResponse(c, http.StatusInternalServerError, "invalid input")
 	}
+
+	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, map[string]interface{}{
+		"token": token,
+	})
 }

@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"github.com/callmehorhe/backtest"
 	"gorm.io/gorm"
 )
@@ -27,6 +29,9 @@ func (r *AuthPostgres) CreateUser(user serv.User)(int, error){
 
 func (r *AuthPostgres) GetUser(email, password string) (serv.User, error){
 	var user serv.User
-	err := r.db.Where("email = ? AND password = ?", email, password).Take(&user).Error
+	user.Email = email
+	user.Password = password
+	err := r.db.Select("id_user").Where("email = ? AND password = ?", email, password).Take(&user).Error
+	log.Print(user)
 	return user, err
 }

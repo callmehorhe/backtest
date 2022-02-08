@@ -7,3 +7,9 @@ db:
   dbname: "delivery"
   sslmode: "disable"
   password: "12345"
+
+email:
+  host: "smtp.yandex.ru"
+  port: "465"
+  username: "callmehorhe"
+  password: "kofzgklynguhlvit"

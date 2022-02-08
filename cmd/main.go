@@ -1,8 +1,6 @@
 package main
 
 import (
-	"log"
-
 	serv "github.com/callmehorhe/backtest"
 	"github.com/callmehorhe/backtest/pkg/handler"
 	"github.com/callmehorhe/backtest/pkg/repository"
@@ -13,7 +11,7 @@ import (
 
 func main() {
 	if err := initConfig(); err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 
 	db, err := repository.NewPostgresDB(repository.Config{
@@ -22,7 +20,7 @@ func main() {
 		Username: viper.GetString("db.username"),
 		DBName:   viper.GetString("db.dbname"),
 		SSLMode:  viper.GetString("db.sslmode"),
-		Password: viper.GetString("db.password"),
+		Password: viper.GetString("db.password"), //os.Getenv("DB_PASSWORD")
 	})
 
 	if err != nil {

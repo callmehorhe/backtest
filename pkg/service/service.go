@@ -10,12 +10,18 @@ type Authorization interface {
 	GenerateToken(email, password string) (string, error)
 }
 
-type Service struct{
+type EmailSendler interface {
+	SendEmail(email, subject, text string) error
+}
+
+type Service struct {
 	Authorization
+	EmailSendler
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		EmailSendler: NewEmailService(),
 	}
 }

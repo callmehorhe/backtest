@@ -3,6 +3,8 @@ package service
 import (
 	"crypto/sha1"
 	"fmt"
+	"log"
+	"math/rand"
 	"time"
 
 	serv "github.com/callmehorhe/backtest"
@@ -11,6 +13,7 @@ import (
 )
 
 const (
+	passwordLetters = "0123456789abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	salt       = "opie435qjojsl123djioqwhfjnd"
 	signingKey = "lasjdoiqjwdnkjsdhfmnasd"
 	tokenTTL   = 12 * time.Hour
@@ -32,7 +35,19 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (s *AuthService) CreateUser(user serv.User) (int, error) {
-	user.Password = geneartePasswordHash(user.Password)
+	rand.Seed(time.Now().UnixNano())
+	pass := ""
+	for i := 0; i < 8; i++ {
+		pass += string(passwordLetters[rand.Intn(82)])
+	}
+	/*
+	---Отправка письма с паролем на почту 
+	text := "Your password:\n    " + pass + "\nНикому не передавайте пароль!"
+	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
+		return 0, err
+	}*/
+	log.Print("ПАРОЛЬ: ", pass)
+	user.Password = geneartePasswordHash(pass)
 	return s.repo.CreateUser(user)
 }
 

@@ -13,7 +13,9 @@ func main() {
 	if err := initConfig(); err != nil {
 		logrus.Fatal(err)
 	}
-
+	/* bot := telegram.NewBot()
+	bot.Start()
+	return */
 	db, err := repository.NewPostgresDB(repository.Config{
 		Host:     viper.GetString("db.host"),
 		Port:     viper.GetString("db.port"),

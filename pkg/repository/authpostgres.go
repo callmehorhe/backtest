@@ -29,6 +29,13 @@ func (r *AuthPostgres) GetUser(email, password string) (serv.User, error) {
 	var user serv.User
 	user.Email = email
 	user.Password = password
-	err := r.db.Select("id_user").Where("email = ? AND password = ?", email, password).Take(&user).Error
+	err := r.db.Select("id_user").Where("email=? AND password=?", email, password).Take(&user).Error
 	return user, err
+}
+
+func (r *AuthPostgres) GetUserById(id int) (serv.User, error) {
+	var user serv.User
+	err := r.db.Where("id_user=?", id).First(&user).Error
+	return user, err
+
 }

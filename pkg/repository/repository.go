@@ -8,14 +8,21 @@ import (
 type Authorization interface {
 	CreateUser(user serv.User) (int, error)
 	GetUser(username, password string) (serv.User, error)
+	GetUserById(id int) (serv.User, error)
+}
+
+type CafeList interface {
+	GetCafeList() []serv.Cafe
 }
 
 type Repository struct {
 	Authorization
+	CafeList
 }
 
 func NewRepository(db *gorm.DB) *Repository{
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
+		CafeList: NewCafePostgres(db),
 	}
 }

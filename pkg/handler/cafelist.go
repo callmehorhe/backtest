@@ -2,7 +2,9 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 
+	serv "github.com/callmehorhe/backtest"
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,4 +15,25 @@ func (h *Handler) GetCafeList(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, cafes)
+}
+
+
+func (h *Handler) GetMenuByCafeID(c *gin.Context) {
+	cafeId, err := strconv.Atoi(c.Param("id"))
+	cafe := h.services.CafeList.GetCafeByID(cafeId)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "wrong request")
+		return
+	}
+
+	positions := h.services.CafeList.GetMenuByCafeID(cafeId)
+	if len(positions) < 1 {
+		newErrorResponse(c, http.StatusInternalServerError, "menu is empty")
+		return
+	}
+	nameAndMenu := &serv.CafeAndMenu{
+		CafeName: cafe.Name,
+		Menu:     positions,
+	}
+	c.JSON(http.StatusOK, nameAndMenu)
 }

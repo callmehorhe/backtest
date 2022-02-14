@@ -18,3 +18,11 @@ func NewCafeService(repo repository.CafeList) *CafeService {
 func (s *CafeService) GetCafeList() []serv.Cafe {
 	return s.repo.GetCafeList()
 } 
+
+func (s *CafeService) GetMenuByCafeID(id int) []serv.Menu {
+	return s.repo.GetMenuByCafeID(id)
+}
+
+func (s *CafeService) GetCafeByID(id int) serv.Cafe {
+	return s.repo.GetCafeByID(id)
+}

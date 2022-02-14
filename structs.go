@@ -17,9 +17,26 @@ type Cafe struct {
 	Id_Menu int    `json:"menu_id"`
 }
 
+type Menu struct {
+	Id_Menu int    `gorn:"primary_key" json:"id"`
+	Name    string `json:"productName"`
+	Image   string `json:"img"`
+	Price   int    `json:"cost"`
+}
+
+type CafeAndMenu struct {
+	CafeName string `json:"name"`
+	Menu     []Menu `json:"menu"`
+}
+
 type Position struct {
-	Name  string `json:"productName"`
-	Price int    `json:"price"`
+	Name  string `json:"name"`
+	Price int    `json:"cost"`
 	Count int    `json:"qty"`
 	Sum   int    `json:"sum"`
+}
+
+type Order struct {
+	CafeId string     `json:"id"`
+	Dishes []Position `json:"menu"`
 }

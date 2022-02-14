@@ -13,6 +13,8 @@ type Authorization interface {
 
 type CafeList interface {
 	GetCafeList() []serv.Cafe
+	GetMenuByCafeID(id int) []serv.Menu
+	GetCafeByID(id int) serv.Cafe
 }
 
 type Repository struct {

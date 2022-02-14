@@ -20,3 +20,15 @@ func (r *CafePostgres) GetCafeList() []serv.Cafe {
 	r.db.Table("cafes").Find(&cafes)
 	return cafes
 }
+
+func (r *CafePostgres) GetMenuByCafeID(id int) []serv.Menu {
+	var positions []serv.Menu
+	r.db.Table("menu").Where("id_cafe=?", id).Find(&positions)
+	return positions
+}
+
+func (r *CafePostgres) GetCafeByID(id int) serv.Cafe {
+	var cafe serv.Cafe
+	r.db.Table("menu").Where("id_cafe=?", id).First(&cafe)
+	return cafe
+}

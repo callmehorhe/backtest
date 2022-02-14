@@ -35,8 +35,12 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			auth.GET("/sign-out", h.signOut)
 
 		}
-		api.GET("/cafes", h.GetCafeList)
-		api.POST("/order")
+		cafes := api.Group("/cafes")
+		{
+			cafes.GET("/", h.GetCafeList)
+			cafes.GET("/:id", h.GetMenuByCafeID)
+		}
+		api.POST("/order", h.OrderSend)
 	}
 	return router
 }

@@ -15,6 +15,7 @@ type CafeList interface {
 	GetCafeList() []serv.Cafe
 	GetMenuByCafeID(id int) []serv.Menu
 	GetCafeByID(id int) serv.Cafe
+	AddChatId(cafe_id int, chat_id int64)
 }
 
 type Repository struct {

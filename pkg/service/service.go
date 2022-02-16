@@ -3,6 +3,8 @@ package service
 import (
 	serv "github.com/callmehorhe/backtest"
 	"github.com/callmehorhe/backtest/pkg/repository"
+	"github.com/callmehorhe/backtest/pkg/service/telegram"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Authorization interface {
@@ -22,16 +24,26 @@ type CafeList interface {
 	GetCafeByID(id int) serv.Cafe
 }
 
+type TGBot interface {
+	Start() error
+	HandleMessge(message *tgbotapi.Message)
+	SendOrder(order serv.Order)
+}
+
 type Service struct {
 	Authorization
 	EmailSendler
 	CafeList
+	TGBot
 }
 
-func NewService(repos *repository.Repository) *Service {
+
+
+func NewService(repos *repository.Repository, bot *tgbotapi.BotAPI) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
 		EmailSendler: NewEmailService(),
 		CafeList: NewCafeService(repos.CafeList),
+		TGBot: telegram.NewBotService(repos.CafeList, bot),
 	}
 }

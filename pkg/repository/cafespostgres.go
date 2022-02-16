@@ -9,7 +9,7 @@ type CafePostgres struct {
 	db *gorm.DB
 }
 
-func NewCafePostgres(db *gorm.DB) *CafePostgres{
+func NewCafePostgres(db *gorm.DB) *CafePostgres {
 	return &CafePostgres{
 		db: db,
 	}
@@ -29,6 +29,10 @@ func (r *CafePostgres) GetMenuByCafeID(id int) []serv.Menu {
 
 func (r *CafePostgres) GetCafeByID(id int) serv.Cafe {
 	var cafe serv.Cafe
-	r.db.Table("menu").Where("id_cafe=?", id).First(&cafe)
+	r.db.Table("cafes").Where("id_cafe=?", id).First(&cafe)
 	return cafe
+}
+
+func (r *CafePostgres) AddChatId(cafe_id int, chat_id int64) {
+	r.db.Table("cafes").Where("id_cafe=?", cafe_id).Update("chat_id", chat_id)
 }

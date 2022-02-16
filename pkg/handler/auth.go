@@ -8,9 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-var (
-	url = "http://localhost:4200"
-)
 
 func (h *Handler) signUp(c *gin.Context) {
 	var input serv.User

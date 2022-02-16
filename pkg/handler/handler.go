@@ -37,10 +37,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		}
 		cafes := api.Group("/cafes")
 		{
-			cafes.GET("/", h.GetCafeList)
-			cafes.GET("/:id", h.GetMenuByCafeID)
+			cafes.GET("/", h.getCafeList)
+			cafes.GET("/:id", h.getMenuByCafeID)
 		}
-		api.POST("/order", h.OrderSend)
+		api.POST("/order", h.orderSend)
 	}
 	return router
 }

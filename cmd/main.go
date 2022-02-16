@@ -5,6 +5,7 @@ import (
 	"github.com/callmehorhe/backtest/pkg/handler"
 	"github.com/callmehorhe/backtest/pkg/repository"
 	"github.com/callmehorhe/backtest/pkg/service"
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
@@ -24,13 +25,18 @@ func main() {
 		SSLMode:  viper.GetString("db.sslmode"),
 		Password: viper.GetString("db.password"), //os.Getenv("DB_PASSWORD")
 	})
-
 	if err != nil {
 		logrus.Fatal("fail init db")
 	}
+
+	tgBot, err := tgbotapi.NewBotAPI("5033082285:AAHcrWQ9_3kOlCirv9k8nuWi7llSWi0thec")
+	if err != nil {
+		logrus.Fatal("cant launch bot")
+	}
 	repos := repository.NewRepository(db)
-	services := service.NewService(repos)
+	services := service.NewService(repos, tgBot)
 	handlers := handler.NewHandler(services)
+	go services.TGBot.Start()
 
 	srv := serv.Server{}
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {

@@ -11,14 +11,10 @@ type Bot struct {
 	repo repository.CafeList
 }
 
-func NewBot() *Bot {
-	bot, err := tgbotapi.NewBotAPI("2053446698:AAGYJ87zvVuKUrDSJXq-gFJWZSFCIv0lCdY")
-	if err != nil {
-		logrus.Fatal(err)
-	}
-	bot.Debug = true
+func NewBotService(repo repository.CafeList, bot *tgbotapi.BotAPI) *Bot {
 	return &Bot{
 		bot: bot,
+		repo: repo,
 	}
 }
 
@@ -41,9 +37,10 @@ func (b *Bot) initUpdateChannel() (tgbotapi.UpdatesChannel, error) {
 
 func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
-		if update.Message == nil { // ignore any non-Message Updates
-			continue
+		if update.Message != nil { // ignore any non-Message Updates
+			b.HandleMessge(update.Message)
+		}else if update.CallbackQuery != nil {
+			b.CallbackHandler(*update.CallbackQuery)
 		}
-		b.HandleMessge(update.Message)
 	}
 }

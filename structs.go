@@ -15,6 +15,7 @@ type Cafe struct {
 	Image   string `json:"img"`
 	Address string `json:"address"`
 	Id_Menu int    `json:"menu_id"`
+	Chat_ID int64  `json:"-"`
 }
 
 type Menu struct {
@@ -37,6 +38,7 @@ type Position struct {
 }
 
 type Order struct {
-	CafeId string     `json:"id"`
-	Dishes []Position `json:"menu"`
+	CafeId  int        `json:"id"`
+	Dishes  []Position `json:"menu"`
+	Address string     `json:"address"`
 }

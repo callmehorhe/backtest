@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func (h *Handler) GetCafeList(c *gin.Context) {
+func (h *Handler) getCafeList(c *gin.Context) {
 	cafes := h.services.CafeList.GetCafeList()
 	if len(cafes) < 1 {
 		newErrorResponse(c, http.StatusInternalServerError, "cafes not found")
@@ -18,7 +18,7 @@ func (h *Handler) GetCafeList(c *gin.Context) {
 }
 
 
-func (h *Handler) GetMenuByCafeID(c *gin.Context) {
+func (h *Handler) getMenuByCafeID(c *gin.Context) {
 	cafeId, err := strconv.Atoi(c.Param("id"))
 	cafe := h.services.CafeList.GetCafeByID(cafeId)
 	if err != nil {

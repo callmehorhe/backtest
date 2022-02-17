@@ -19,26 +19,41 @@ type Cafe struct {
 }
 
 type Menu struct {
-	Id_Menu int    `gorn:"primary_key" json:"id"`
-	Name    string `json:"productName"`
-	Image   string `json:"img"`
-	Price   int    `json:"cost"`
+	Id_Menu  int    `gorm:"primary_key" json:"id"`
+	Name     string `json:"productName"`
+	Image    string `json:"img"`
+	Price    int    `json:"cost"`
+	Category string `json:"category"`
+}
+
+type Category struct {
+	Category_Name string `json:"name"`
+	Menu_List     []Menu `json:"cart"`
 }
 
 type CafeAndMenu struct {
-	CafeName string `json:"name"`
-	Menu     []Menu `json:"menu"`
+	Cafe_Name  string     `json:"name"`
+	Categories []Category `json:"category"`
 }
 
 type Position struct {
-	Name  string `json:"name"`
+	ID    int    `json:"productId"`
+	Name  string `json:"productName"`
 	Price int    `json:"cost"`
 	Count int    `json:"qty"`
 	Sum   int    `json:"sum"`
 }
 
 type Order struct {
-	CafeId  int        `json:"id"`
-	Dishes  []Position `json:"menu"`
-	Address string     `json:"address"`
+	Order_ID        int        `gorm:"primary_key" json:"order_id"`
+	User_ID         int        `json:"user_id"`
+	Cafe_Id         int        `json:"cafeId"`
+	Order_date      string     `json:"date"`
+	Cost            int        `json:"cost"`
+	Order_list      []int      `gorm:"type:integer[]" json:"-"`
+	Positions       []Position `gorm:"-" json:"cart"`
+	Address         string     `json:"address"`
+	Status_accepted bool
+	Status_sent     bool
+	Status_canceled bool
 }

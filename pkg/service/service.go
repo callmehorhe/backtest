@@ -22,6 +22,7 @@ type CafeList interface {
 	GetCafeList() []serv.Cafe
 	GetMenuByCafeID(id int) []serv.Menu
 	GetCafeByID(id int) serv.Cafe
+	GetCategoriesByCafeID(id int) []string
 }
 
 type TGBot interface {
@@ -44,6 +45,6 @@ func NewService(repos *repository.Repository, bot *tgbotapi.BotAPI) *Service {
 		Authorization: NewAuthService(repos.Authorization),
 		EmailSendler: NewEmailService(),
 		CafeList: NewCafeService(repos.CafeList),
-		TGBot: telegram.NewBotService(repos.CafeList, bot),
+		TGBot: telegram.NewBotService(*repos, bot),
 	}
 }

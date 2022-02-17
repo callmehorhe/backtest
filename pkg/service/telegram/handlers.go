@@ -76,24 +76,24 @@ func (b *Bot) SendMessage(chatID int64, text string) {
 }
 
 func (b *Bot) SendOrder(order serv.Order) {
-	orderId := 132456789
-	cafe := b.repo.GetCafeByID(order.CafeId)
-	text := fmt.Sprintf("Заказ № %d\n%s\n", orderId, cafe.Name)
+	id := b.repo.Orders.CreateOrder(order)
+	cafe := b.repo.GetCafeByID(order.Cafe_Id)
+	text := fmt.Sprintf("Заказ № %d\n%s\n", id, cafe.Name)
 	sum := 0
-	for i := range order.Dishes {
-		text += fmt.Sprintf("%d: %s - %d шт.\n", i+1, order.Dishes[i].Name, order.Dishes[i].Count)
-		sum += order.Dishes[i].Sum
+	for i := range order.Positions {
+		text += fmt.Sprintf("%d: %s - %d шт.\n", i+1, order.Positions[i].Name, order.Positions[i].Count)
+		sum += order.Positions[i].Sum
 	}
 	text += fmt.Sprintf("Итого: %dр.", sum)
 	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("acceptf%d", orderId)),
+			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("acceptf%d", id)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Отправить заказ", fmt.Sprintf("sendf%d", orderId)),
+			tgbotapi.NewInlineKeyboardButtonData("Отправить заказ", fmt.Sprintf("sendf%d", id)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Отменить заказ", fmt.Sprintf("cancelf%d", orderId)),
+			tgbotapi.NewInlineKeyboardButtonData("Отменить заказ", fmt.Sprintf("cancelf%d", id)),
 		),
 	)
 	msg := tgbotapi.NewMessage(cafe.Chat_ID, text)
@@ -103,13 +103,55 @@ func (b *Bot) SendOrder(order serv.Order) {
 
 func (b *Bot) CallbackHandler(callback tgbotapi.CallbackQuery) {
 	tmp := strings.Split(callback.Data, "f")
-	id := tmp[1]
+	id, _ := strconv.Atoi(tmp[1])
 	switch tmp[0] {
 	case "accept":
-		b.SendMessage(callback.Message.Chat.ID, fmt.Sprintf("Заказ %s отменен", id))
+		b.Accept(callback.Message.Chat.ID, id)
 	case "send":
-		b.SendMessage(callback.Message.Chat.ID, fmt.Sprintf("Заказ %s отправлен", id))
+		b.Send(callback.Message.Chat.ID, id)
 	case "cancel":
-		b.SendMessage(callback.Message.Chat.ID, fmt.Sprintf("Заказ %s отменен", id))
+		b.Cancel(callback.Message.Chat.ID, id)
 	}
+}
+
+func (b *Bot) Accept(chat_ID int64, id int) {
+	order := b.repo.Orders.GetOrderByID(id)
+	if order.Status_accepted {
+		b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d был подтвержден ранее!", id))
+		return
+	} else if order.Status_canceled {
+		b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d был отменен!", id))
+		return
+	}
+	order.Status_accepted = true
+	b.repo.Orders.UpdateOrder(order)
+	b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d подтвержден!", id))
+}
+
+func (b *Bot) Send(chat_ID int64, id int) {
+	order := b.repo.Orders.GetOrderByID(id)
+	if !order.Status_accepted {
+		b.SendMessage(chat_ID, fmt.Sprintf("Для начала подтвердите заказ №%d!", id))
+		return
+	} else if order.Status_canceled {
+		b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d был отменен!", id))
+		return
+	}
+	order.Status_sent = true
+	b.repo.Orders.UpdateOrder(order)
+	b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d отправлен!", id))
+}
+
+func (b *Bot) Cancel(chat_ID int64, id int) {
+	order := b.repo.Orders.GetOrderByID(id)
+	if order.Status_accepted {
+		b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d уже был подтвержден! Нельзя отменить подтвержденный заказ!", id))
+		return
+	} else if order.Status_canceled {
+		b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d был отменен ранее!", id))
+		return
+	}
+	order.Status_canceled = true
+	b.repo.Orders.UpdateOrder(order)
+	b.SendMessage(chat_ID, fmt.Sprintf("Заказ №%d отменен!", id))
 }

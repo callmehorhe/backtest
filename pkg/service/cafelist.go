@@ -26,3 +26,7 @@ func (s *CafeService) GetMenuByCafeID(id int) []serv.Menu {
 func (s *CafeService) GetCafeByID(id int) serv.Cafe {
 	return s.repo.GetCafeByID(id)
 }
+
+func (s *CafeService) GetCategoriesByCafeID(id int) []string {
+	return s.repo.GetCategoriesByCafeID(id)
+}

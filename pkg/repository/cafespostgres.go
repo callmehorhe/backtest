@@ -36,3 +36,9 @@ func (r *CafePostgres) GetCafeByID(id int) serv.Cafe {
 func (r *CafePostgres) AddChatId(cafe_id int, chat_id int64) {
 	r.db.Table("cafes").Where("id_cafe=?", cafe_id).Update("chat_id", chat_id)
 }
+
+func (r *CafePostgres) GetCategoriesByCafeID(id int) []string {
+	var categories []string
+	r.db.Table("menu").Select("category").Where("id_cafe=?", id).Group("category").Find(&categories)
+	return categories
+}

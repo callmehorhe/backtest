@@ -1,0 +1,77 @@
+CREATE DATABASE delivery
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Russian_Russia.1251'
+    LC_CTYPE = 'Russian_Russia.1251'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+CREATE TABLE public.users
+(
+    id_user serial NOT NULL,
+    name character varying(255) NOT NULL,
+    email character varying(255) NOT NULL UNIQUE,
+    phone character varying(255) NOT NULL UNIQUE,
+    password character varying(255) NOT NULL,
+    PRIMARY KEY (id_user)
+);
+
+ALTER TABLE IF EXISTS public.users
+    OWNER to postgres;
+
+CREATE TABLE IF NOT EXISTS public.cafes
+(
+    id_cafe serial NOT NULL,
+    name character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    phone character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    image character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    address character varying(255) COLLATE pg_catalog."default" NOT NULL,
+    id_menu integer NOT NULL,
+    CONSTRAINT cafes_pkey PRIMARY KEY (id_cafe),
+    CONSTRAINT cafes_name_key UNIQUE (name),
+    CONSTRAINT cafes_phone_key UNIQUE (phone)
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.cafes
+    OWNER to postgres;
+
+insert into cafes values
+(1, 'Шашлычный двор', '+79298011111', 'https://i.ibb.co/8891w7s/image.png', 'ул. Ивана Иванова 1', 1),
+(2, 'Vincenzo', '+79298022222', 'https://i.ibb.co/PjjnXpB/download.jpg', 'ул. Петра Петрова 1', 2)
+
+CREATE TABLE IF NOT EXISTS public.menu
+(
+	id_menu serial PRIMARY KEY,
+    id_cafe int references public.cafes(id_cafe)  NOT NULL,
+	name varchar(255) NOT NULL,
+	price int NOT NULL,
+	image varchar(255) not null
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.menu
+    OWNER to postgres;
+
+insert into public.menu values
+(1, 1, 'Гамбургер', 250, 'https://i.ibb.co/vX1Kt4g/p-O.jpg'),
+(2, 1, 'Чизбургер', '250', '...', 'Бургеры'),
+(3, 1, 'Таук', '220', '...', 'Шаурма/Таук'),
+(4, 1, 'Таук экстра', '260', '...', 'Шаурма/Таук'),
+(5, 1, 'Шаурма', '220', '...', 'Шаурма/Таук'),
+(6, 1, 'Шаурма экстра', '260', '...', 'Шаурма/Таук');
+
+CREATE TABLE IF NOT EXISTS public.orders
+(
+	id_order serial PRIMARY KEY,
+	user_id integer NOT NULL REFERENCES users(id_user),
+	cafe_id integer NOT NULL REFERENCES cafes(id_cafe),
+	order_date date NOT NULL,
+	order_list int[] NOT NULL,
+	status_accepted bool,
+	status_sent bool,
+	status_canceled bool
+);

@@ -8,10 +8,10 @@ import (
 
 type Bot struct {
 	bot *tgbotapi.BotAPI
-	repo repository.CafeList
+	repo repository.Repository
 }
 
-func NewBotService(repo repository.CafeList, bot *tgbotapi.BotAPI) *Bot {
+func NewBotService(repo repository.Repository, bot *tgbotapi.BotAPI) *Bot {
 	return &Bot{
 		bot: bot,
 		repo: repo,

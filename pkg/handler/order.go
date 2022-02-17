@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	serv "github.com/callmehorhe/backtest"
+	_ "gorm.io/driver/postgres"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,9 +15,7 @@ func (h *Handler) orderSend(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid request")
 		return 
 	}
-
 	h.services.TGBot.SendOrder(input)
-	
 	
 	c.AbortWithStatus(http.StatusOK)
 }

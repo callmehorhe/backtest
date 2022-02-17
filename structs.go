@@ -1,5 +1,7 @@
 package serv
 
+import "gorm.io/datatypes"
+
 type User struct {
 	Id_User  int    `gorm:"primary_key" json:"-"`
 	Name     string `json:"name"`
@@ -45,14 +47,14 @@ type Position struct {
 }
 
 type Order struct {
-	Order_ID        int        `gorm:"primary_key" json:"order_id"`
-	User_ID         int        `json:"user_id"`
-	Cafe_Id         int        `json:"cafeId"`
-	Order_date      string     `json:"date"`
-	Cost            int        `json:"cost"`
-	Order_list      []int      `gorm:"type:integer[]" json:"-"`
-	Positions       []Position `gorm:"-" json:"cart"`
-	Address         string     `json:"address"`
+	Order_ID        int            `gorm:"primary_key" json:"order_id"`
+	User_ID         int            `json:"user_id"`
+	Cafe_Id         int            `json:"cafeId"`
+	Order_date      string         `json:"date"`
+	Cost            int            `json:"cost"`
+	Order_list      datatypes.JSON `json:"-"`
+	Positions       []Position     `gorm:"-" json:"cart"`
+	Address         string         `json:"address"`
 	Status_accepted bool
 	Status_sent     bool
 	Status_canceled bool

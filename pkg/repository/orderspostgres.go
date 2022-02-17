@@ -1,10 +1,11 @@
 package repository
 
 import (
+	"encoding/json"
 	"time"
 
 	serv "github.com/callmehorhe/backtest"
-	//"gorm.io/datatypes"
+	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
 
@@ -18,13 +19,14 @@ func NewOrderPostgres(db *gorm.DB) *OrderPostgres {
 	}
 }
 
+
+
 func (r *OrderPostgres) CreateOrder(order serv.Order) int {
 	var id int
-	var list []int
-	for i := range order.Positions {
-		list = append(list, order.Positions[i].ID)
-	}
-	order.Order_list = list
+	
+	j, _ := json.Marshal(order.Positions)
+
+	order.Order_list = datatypes.JSON(j)
 	order.Order_date = time.Now().Format("2006-01-02 15:04:05")
 	
 	row := r.db.Table("orders").Create(&order)
@@ -37,17 +39,12 @@ func (r *OrderPostgres) CreateOrder(order serv.Order) int {
 
 func (r *OrderPostgres) UpdateOrder(order serv.Order) {
 	id := order.Order_ID
-	var list []int
-	for i := range order.Positions {
-		list = append(list, order.Positions[i].ID)
-	}
 
 	r.db.Table("orders").Where("order_id=?", id).Updates(&serv.Order{
 		User_ID:         order.User_ID,
 		Cafe_Id:         order.Cafe_Id,
 		Order_date:      order.Order_date,
 		Cost:            order.Cost,
-		Order_list:      list,
 		Address:         order.Address,
 		Status_accepted: order.Status_accepted,
 		Status_sent:     order.Status_sent,

@@ -82,7 +82,7 @@ func (b *Bot) SendOrder(order serv.Order) {
 	sum := 0
 	for i := range order.Positions {
 		text += fmt.Sprintf("%d: %s - %d шт.\n", i+1, order.Positions[i].Name, order.Positions[i].Count)
-		sum += order.Positions[i].Sum
+		sum += order.Positions[i].Count * order.Positions[i].Price
 	}
 	text += fmt.Sprintf("Итого: %dр.", sum)
 	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(

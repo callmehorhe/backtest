@@ -3,29 +3,28 @@ package serv
 import "gorm.io/datatypes"
 
 type User struct {
-	Id_User  int    `gorm:"primary_key" json:"-"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Phone    string `json:"phone"`
-	Password string `json:"password"`
+	Id_User  int    `json:"-"        gorm:"type:serial;primary_key"`
+	Name     string `json:"name"     gorm:"type:varchar(255);not null"`
+	Email    string `json:"email"    gorm:"type:varchar(255);unique;not null"`
+	Phone    string `json:"phone"    gorm:"type:varchar(255);unique;not null"`
+	Password string `json:"password" gorm:"type:varchar(255);not null"`
 }
 
 type Cafe struct {
-	Id_Cafe int    `gorm:"primary_key" json:"id"`
-	Name    string `json:"name"`
-	Phone   string `json:"phone"`
-	Image   string `json:"img"`
-	Address string `json:"address"`
-	Id_Menu int    `json:"menu_id"`
-	Chat_ID int64  `json:"-"`
+	Id_Cafe int    `json:"id"      gorm:"primary_key;type:serial"`
+	Name    string `json:"name"    gorm:"type:varchar(255)"`
+	Phone   string `json:"phone"   gorm:"type:varchar(255)"`
+	Image   string `json:"img"     gorm:"type:varchar(255)"`
+	Address string `json:"address" gorm:"type:varchar(255)"`
+	Chat_ID int64  `json:"-"       gorm:"type:bigint"`
 }
 
 type Menu struct {
-	Id_Menu  int    `gorm:"primary_key" json:"id"`
-	Name     string `json:"productName"`
-	Image    string `json:"img"`
-	Price    int    `json:"cost"`
-	Category string `json:"category"`
+	Id_Menu  int    `json:"id"          gorm:"primary_key;type:serial"`
+	Name     string `json:"productName" gorm:"type:varchar(255)"`
+	Image    string `json:"img"         gorm:"type:varchar(255)"`
+	Price    int    `json:"cost"        gorm:"type:integer"`
+	Category string `json:"category"    gorm:"type:varchar(255)"`
 }
 
 type Category struct {
@@ -47,15 +46,16 @@ type Position struct {
 }
 
 type Order struct {
-	Order_ID        int            `gorm:"primary_key" json:"order_id"`
-	User_ID         int            `json:"user_id"`
-	Cafe_Id         int            `json:"cafeId"`
-	Order_date      string         `json:"date"`
-	Cost            int            `json:"cost"`
-	Order_list      datatypes.JSON `json:"-"`
-	Positions       []Position     `gorm:"-" json:"cart"`
-	Address         string         `json:"address"`
-	Status_accepted bool
-	Status_sent     bool
-	Status_canceled bool
+	Order_ID        int            `json:"order_id" gorm:"primary_key;type:serial"`
+	User_ID         int            `json:"user_id"  gorm:"type:integer"`
+	Cafe_Id         int            `json:"cafeId"   gorm:"type:integer"`
+	Order_date      string         `json:"date"     gorm:"type:timestamp with time zone"`
+	Cost            int            `json:"cost"     gorm:"type:integer"`
+	Order_list      datatypes.JSON `json:"-"        gorm:"type:jsonb"`
+	Positions       []Position     `json:"cart"     gorm:"-"`
+	Address         string         `json:"address"  gorm:"type:varchar(255)"`
+	Phone           string         `json:"phone"    gorm:"type:varchar(255)"`
+	Status_accepted bool           `json:"-"        gorm:"type:bool"`
+	Status_sent     bool           `json:"-"        gorm:"type:bool"`
+	Status_canceled bool           `json:"-"        gorm:"type:bool"`
 }

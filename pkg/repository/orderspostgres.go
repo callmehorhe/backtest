@@ -45,7 +45,6 @@ func (r *OrderPostgres) UpdateOrder(order serv.Order) {
 		Cafe_Id:         order.Cafe_Id,
 		Order_date:      order.Order_date,
 		Cost:            order.Cost,
-		Address:         order.Address,
 		Status_accepted: order.Status_accepted,
 		Status_sent:     order.Status_sent,
 		Status_canceled: order.Status_canceled,

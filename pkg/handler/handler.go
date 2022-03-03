@@ -42,6 +42,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 				cafes.GET("/", h.getCafeList)
 				cafes.GET("/:id", h.getMenuByCafeID)
 			}
+			api.GET("/user/:id", h.userProfile)
 			api.POST("/order", h.orderSend)
 			api.GET("/orders/:id", h.getOrderList)
 		}

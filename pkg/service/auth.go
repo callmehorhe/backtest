@@ -4,7 +4,6 @@ import (
 	"crypto/sha1"
 	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"time"
 
@@ -37,18 +36,18 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(user serv.User) (int, error) {
 	rand.Seed(time.Now().UnixNano())
-	pass := ""
-	for i := 0; i < 8; i++ {
-		pass += string(passwordLetters[rand.Intn(82)])
+	validation := ""
+	for i := 0; i < 6; i++ {
+		validation += string(passwordLetters[rand.Intn(82)])
 	}
 	/*
 		---Отправка письма с паролем на почту */
-	text := "Your password:\n    " + pass + "\nНикому не передавайте пароль!"
+	text := "Ващ код подтверждения:\n    " + validation + "\nНикому не передавайте пароль!"
 	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
 		return 0, err
 	}
-	log.Print("ПАРОЛЬ: ", pass)
-	user.Password = geneartePasswordHash(pass)
+	user.Password = geneartePasswordHash(user.Password)
+	user.Validation = validation
 	return s.repo.CreateUser(user)
 }
 
@@ -70,8 +69,12 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *AuthService) GetUser(email, password string) serv.User {
-	return s.repo.GetUser(email, geneartePasswordHash(password))
+func (s *AuthService) GetUser(email, password string) (serv.User, error) {
+	user := s.repo.GetUser(email, geneartePasswordHash(password))
+	if user.Validation != "" {
+		return serv.User{}, errors.New("varify your email address!")
+	}
+	return user, nil
 }
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {

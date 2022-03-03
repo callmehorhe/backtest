@@ -2,7 +2,7 @@ package handler
 
 import (
 	"net/http"
-	"strings"
+	"strconv"
 	"time"
 
 	serv "github.com/callmehorhe/backtest"
@@ -36,7 +36,11 @@ func (h *Handler) signIn(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid input")
 		return
 	}
-	user := h.services.GetUser(input.Email, input.Password)
+	user, err := h.services.GetUser(input.Email, input.Password)
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
 	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
@@ -71,45 +75,16 @@ func (h *Handler) signOut(c *gin.Context) {
 	})
 }
 
-func (h *Handler) auth(c *gin.Context) {
-	auth := c.GetHeader("Authorization")
-	if len(auth) == 0 {
-		newErrorResponse(c, http.StatusUnauthorized, "authorization header is not provided")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, "authorization header is not provided")
-		return
-	}
-
-	fields := strings.Fields(auth)
-	if len(fields) < 2 {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid authorization header format")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, "invalid authorization header format")
-		return
-	}
-
-	authorizationType := strings.ToLower(fields[0])
-	if authorizationType != "bearer" {
-		newErrorResponse(c, http.StatusUnauthorized, "unsupported authorization type")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, "unsupported authorization type")
-		return
-	}
-
-	accessToken := fields[1]
-	id, err := h.services.ParseToken(accessToken)
+func (h *Handler) userProfile(c *gin.Context) {
+	user_id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		h.signOut(c)
-		newErrorResponse(c, http.StatusUnauthorized, "unauth user")
-		c.AbortWithStatusJSON(http.StatusUnauthorized, "unauth user")
+		newErrorResponse(c, http.StatusInternalServerError, "incorrect user id")
 		return
 	}
-
-	user, err := h.services.GetUserByID(id)
+	user, err := h.services.Authorization.GetUserByID(user_id)
 	if err != nil {
-		h.signOut(c)
-		newErrorResponse(c, http.StatusUnauthorized, "user not found")
+		newErrorResponse(c, http.StatusInternalServerError, "such user not found")
 		return
 	}
-	c.Set("isLoggedIn", true)
-	c.Set("userId", user.Id_User)
-	c.Set("username", user.Name)
-	c.Next()
+	c.JSON(http.StatusOK, user)
 }

@@ -3,11 +3,12 @@ package serv
 import "gorm.io/datatypes"
 
 type User struct {
-	Id_User  int    `json:"-"        gorm:"type:serial;primary_key"`
-	Name     string `json:"name"     gorm:"type:varchar(255);not null"`
-	Email    string `json:"email"    gorm:"type:varchar(255);unique;not null"`
-	Phone    string `json:"phone"    gorm:"type:varchar(255);unique;not null"`
-	Password string `json:"password" gorm:"type:varchar(255);not null"`
+	Id_User    int    `json:"-"        gorm:"type:serial;primary_key"`
+	Name       string `json:"name"     gorm:"type:varchar(255);not null"`
+	Email      string `json:"email"    gorm:"type:varchar(255);unique;not null"`
+	Phone      string `json:"phone"    gorm:"type:varchar(255);unique;not null"`
+	Validation string `json:"-"        gorm:"type:varchar(255);unique;"`
+	Password   string `json:"password" gorm:"type:varchar(255);not null"`
 }
 
 type Cafe struct {

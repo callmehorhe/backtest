@@ -11,7 +11,7 @@ type Authorization interface {
 	CreateUser(user serv.User) (int, error)
 	GenerateToken(email, password string) (string, error)
 	ParseToken(accessToken string) (int, error)
-	GetUser(email, password string) serv.User
+	GetUser(email, password string) (serv.User, error)
 	GetUserByID(id int) (serv.User, error)
 }
 

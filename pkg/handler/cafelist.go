@@ -17,7 +17,6 @@ func (h *Handler) getCafeList(c *gin.Context) {
 	c.JSON(http.StatusOK, cafes)
 }
 
-
 func (h *Handler) getMenuByCafeID(c *gin.Context) {
 	cafeId, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -27,29 +26,25 @@ func (h *Handler) getMenuByCafeID(c *gin.Context) {
 	cafe := h.services.CafeList.GetCafeByID(cafeId)
 
 	positions := h.services.CafeList.GetMenuByCafeID(cafeId)
-	if len(positions) < 1 {
-		newErrorResponse(c, http.StatusInternalServerError, "menu is empty")
-		return
-	}
 
-	categories := []serv.Category{}
-	name := h.services.CafeList.GetCategoriesByCafeID(cafeId)
-	for _, category := range name {
-		var dish_List []serv.Menu
+	var dish_List []serv.Menu
+	categories := h.services.CafeList.GetCategoriesByCafeID(cafeId)
+	for _, category := range categories {
 		for _, pos := range positions {
 			if pos.Category == category {
 				dish_List = append(dish_List, pos)
 			}
 		}
-		categories = append(categories, serv.Category{
-			Category_Name: category,
-			Menu_List: dish_List,
-		})
+	}
+	if len(dish_List) < 1 {
+		newErrorResponse(c, http.StatusInternalServerError, "menu is empty")
+		return
 	}
 
 	nameAndMenu := &serv.CafeAndMenu{
-		Cafe_Name: cafe.Name,
+		Cafe_Name:  cafe.Name,
 		Categories: categories,
+		Menu:       dish_List,
 	}
 	c.JSON(http.StatusOK, nameAndMenu)
 }

@@ -66,11 +66,14 @@ insert into public.menu values
 
 CREATE TABLE IF NOT EXISTS public.orders
 (
-	id_order serial PRIMARY KEY,
+	order_id serial PRIMARY KEY,
 	user_id integer NOT NULL REFERENCES users(id_user),
 	cafe_id integer NOT NULL REFERENCES cafes(id_cafe),
 	order_date date NOT NULL,
-	order_list int[] NOT NULL,
+	cost integer not null,
+	order_list jsonb NOT NULL,
+	address varchar(255),
+	phone varchar(255),
 	status_accepted bool,
 	status_sent bool,
 	status_canceled bool

@@ -7,7 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user serv.User) (int, error)
-	GetUser(username, password string) (serv.User, error)
+	GetUser(username, password string) serv.User
 	GetUserById(id int) (serv.User, error)
 }
 
@@ -21,8 +21,10 @@ type CafeList interface {
 
 type Orders interface {
 	CreateOrder(order serv.Order) int
-	UpdateOrder(order serv.Order)
+	UpdateOrder(order serv.Order) serv.Order
 	GetOrderByID(id int) serv.Order
+	GetOrdersByUser(id int) []serv.Order
+	GetCafeNameByID(id int) string
 }
 
 type Repository struct {
@@ -31,10 +33,10 @@ type Repository struct {
 	Orders
 }
 
-func NewRepository(db *gorm.DB) *Repository{
+func NewRepository(db *gorm.DB) *Repository {
 	return &Repository{
 		Authorization: NewAuthPostgres(db),
-		CafeList: NewCafePostgres(db),
-		Orders: NewOrderPostgres(db),
+		CafeList:      NewCafePostgres(db),
+		Orders:        NewOrderPostgres(db),
 	}
 }

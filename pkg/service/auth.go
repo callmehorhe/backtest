@@ -15,9 +15,9 @@ import (
 
 const (
 	passwordLetters = "0123456789abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	salt       = "opie435qjojsl123djioqwhfjnd"
-	signingKey = "lasjdoiqjwdnkjsdhfmnasd"
-	tokenTTL   = 12 * time.Hour
+	salt            = "opie435qjojsl123djioqwhfjnd"
+	signingKey      = "lasjdoiqjwdnkjsdhfmnasd"
+	tokenTTL        = 12 * time.Hour
 )
 
 type tokenClaims struct {
@@ -42,26 +42,22 @@ func (s *AuthService) CreateUser(user serv.User) (int, error) {
 		pass += string(passwordLetters[rand.Intn(82)])
 	}
 	/*
-	---Отправка письма с паролем на почту 
+		---Отправка письма с паролем на почту */
 	text := "Your password:\n    " + pass + "\nНикому не передавайте пароль!"
 	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
 		return 0, err
-	}*/
+	}
 	log.Print("ПАРОЛЬ: ", pass)
 	user.Password = geneartePasswordHash(pass)
 	return s.repo.CreateUser(user)
 }
 
-func (s *AuthService) GetUserByID(id int) (serv.User, error){
+func (s *AuthService) GetUserByID(id int) (serv.User, error) {
 	return s.repo.GetUserById(id)
 }
 
 func (s *AuthService) GenerateToken(email, password string) (string, error) {
-	user, err := s.repo.GetUser(email, geneartePasswordHash(password))
-
-	if err != nil {
-		return "", err
-	}
+	user := s.repo.GetUser(email, geneartePasswordHash(password))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
@@ -74,6 +70,9 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
+func (s *AuthService) GetUser(email, password string) serv.User {
+	return s.repo.GetUser(email, geneartePasswordHash(password))
+}
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

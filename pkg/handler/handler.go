@@ -26,21 +26,25 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		AllowCredentials: true,
 	}))
 
-	api := router.Group("/api")
+	slash := router.Group("/")
 	{
-		auth := api.Group("/auth")
+		api := slash.Group("/api")
 		{
-			auth.POST("/sign-up", h.signUp)
-			auth.POST("/sign-in", h.signIn)
-			auth.GET("/sign-out", h.signOut)
+			auth := api.Group("/auth")
+			{
+				auth.POST("/sign-up", h.signUp)
+				auth.POST("/sign-in", h.signIn)
+				auth.GET("/sign-out", h.signOut)
 
+			}
+			cafes := api.Group("/cafes")
+			{
+				cafes.GET("/", h.getCafeList)
+				cafes.GET("/:id", h.getMenuByCafeID)
+			}
+			api.POST("/order", h.orderSend)
+			api.GET("/orders/:id", h.getOrderList)
 		}
-		cafes := api.Group("/cafes")
-		{
-			cafes.GET("/", h.getCafeList)
-			cafes.GET("/:id", h.getMenuByCafeID)
-		}
-		api.POST("/order", h.orderSend)
 	}
 	return router
 }

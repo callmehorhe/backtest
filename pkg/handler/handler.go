@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/callmehorhe/backtest/pkg/service"
-	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,14 +16,9 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
-	router := gin.New()
-	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"*"},
-		AllowMethods:     []string{"POST", "GET", "PUT", "PATCH"},
-		AllowHeaders:     []string{"Origin"},
-		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true,
-	}))
+	gin.SetMode(gin.ReleaseMode)
+	router := gin.Default()
+	router.Use(CORSMiddleware)
 
 	slash := router.Group("/")
 	{

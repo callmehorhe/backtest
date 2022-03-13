@@ -8,18 +8,16 @@ import (
 	"github.com/callmehorhe/backtest/pkg/repository"
 	"github.com/callmehorhe/backtest/pkg/service"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 	if err := initConfig(); err != nil {
 		logrus.Fatal(err)
 	}
-	/* bot := telegram.NewBot()
-	bot.Start()
-	return */
+
 	if err := godotenv.Load(); err != nil {
 		logrus.Error(err)
 	}

@@ -1,4 +1,4 @@
-port: "8000"
+port: "127.0.4.69:56502"
 
 db:
   username: "postgres"
@@ -9,7 +9,7 @@ db:
   password: "12345"
 
 email:
-  host: "smtp.yandex.ru"
+  host: "smtp.mail.ru"
   port: "465"
-  username: "callmehorhe"
-  password: "kofzgklynguhlvit"
+  username: "reg_deliveryhouse@mail.ru"
+  password: "wjVC1MJX7zWgH2ZRgKv2"

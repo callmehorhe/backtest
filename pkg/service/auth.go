@@ -36,18 +36,17 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(user serv.User) (int, error) {
 	rand.Seed(time.Now().UnixNano())
-	validation := ""
-	for i := 0; i < 6; i++ {
-		validation += string(passwordLetters[rand.Intn(82)])
+	pass := ""
+	for i := 0; i < 8; i++ {
+		pass += string(passwordLetters[rand.Intn(82)])
 	}
 	/*
 		---Отправка письма с паролем на почту */
-	text := "Ващ код подтверждения:\n    " + validation + "\nНикому не передавайте пароль!"
+	text := "Ваш пароль:\n    " + pass + "\nНикому не передавайте пароль!"
 	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
 		return 0, err
 	}
-	user.Password = geneartePasswordHash(user.Password)
-	user.Validation = validation
+	user.Password = geneartePasswordHash(pass)
 	return s.repo.CreateUser(user)
 }
 
@@ -56,8 +55,10 @@ func (s *AuthService) GetUserByID(id int) (serv.User, error) {
 }
 
 func (s *AuthService) GenerateToken(email, password string) (string, error) {
-	user := s.repo.GetUser(email, geneartePasswordHash(password))
-
+	user, err := s.repo.GetUser(email, geneartePasswordHash(password))
+	if err != nil {
+		return "", err
+	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, &tokenClaims{
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
@@ -70,11 +71,7 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 }
 
 func (s *AuthService) GetUser(email, password string) (serv.User, error) {
-	user := s.repo.GetUser(email, geneartePasswordHash(password))
-	if user.Validation != "" {
-		return serv.User{}, errors.New("varify your email address!")
-	}
-	return user, nil
+	return s.repo.GetUser(email, geneartePasswordHash(password))
 }
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {

@@ -7,7 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user serv.User) (int, error)
-	GetUser(username, password string) serv.User
+	GetUser(username, password string) (serv.User, error)
 	GetUserById(id int) (serv.User, error)
 }
 

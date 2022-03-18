@@ -40,14 +40,18 @@ func (s *AuthService) CreateUser(user serv.User) (int, error) {
 	for i := 0; i < 8; i++ {
 		pass += string(passwordLetters[rand.Intn(82)])
 	}
-	/*
-		---Отправка письма с паролем на почту */
+
+	user.Password = geneartePasswordHash(pass)
+	id, err := s.repo.CreateUser(user)
+	if err != nil {
+		return 0, err
+	}
 	text := "Ваш пароль:\n    " + pass + "\nНикому не передавайте пароль!"
 	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
 		return 0, err
 	}
-	user.Password = geneartePasswordHash(pass)
-	return s.repo.CreateUser(user)
+
+	return id, nil
 }
 
 func (s *AuthService) GetUserByID(id int) (serv.User, error) {

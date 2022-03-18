@@ -14,10 +14,12 @@ func (h *Handler) signUp(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid input body")
+		return
 	}
 	id, err := h.services.Authorization.CreateUser(input)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
 	}
 	c.JSON(http.StatusOK, map[string]interface{}{
 		"id": id,
@@ -38,20 +40,20 @@ func (h *Handler) signIn(c *gin.Context) {
 	}
 	user, err := h.services.GetUser(input.Email, input.Password)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
 	token, err := h.services.Authorization.GenerateToken(input.Email, input.Password)
 	if err != nil {
-		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
 		return
 	}
-
+	c.Writer.Header().Set("Authorization", token)
 	cookie := &http.Cookie{
 		Name:     "token",
 		Value:    token,
 		Path:     "/",
-		Expires:  time.Now().Add(time.Hour * 24),
+		Expires:  time.Now().Add(time.Hour * 24 * 30),
 		HttpOnly: true,
 	}
 	http.SetCookie(c.Writer, cookie)

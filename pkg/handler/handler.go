@@ -22,15 +22,15 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	slash := router.Group("/")
 	{
-		api := slash.Group("/api")
+		auth := slash.Group("/auth")
 		{
-			auth := api.Group("/auth")
-			{
-				auth.POST("/sign-up", h.signUp)
-				auth.POST("/sign-in", h.signIn)
-				auth.GET("/sign-out", h.signOut)
+			auth.POST("/sign-up", h.signUp)
+			auth.POST("/sign-in", h.signIn)
+			auth.GET("/sign-out", h.signOut)
 
-			}
+		}
+		api := slash.Group("/api", h.Auth)
+		{
 			cafes := api.Group("/cafes")
 			{
 				cafes.GET("/", h.getCafeList)
@@ -41,5 +41,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			api.GET("/orders/:id", h.getOrderList)
 		}
 	}
+
 	return router
 }

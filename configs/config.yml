@@ -1,4 +1,4 @@
-port: "127.0.4.69:56502"
+port: ":8000"
 
 db:
   username: "postgres"
@@ -6,7 +6,6 @@ db:
   port: "5432"
   dbname: "delivery"
   sslmode: "disable"
-  password: "12345"
 
 email:
   host: "smtp.mail.ru"

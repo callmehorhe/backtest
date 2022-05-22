@@ -24,6 +24,8 @@ type CafeList interface {
 	GetMenuByCafeID(id int) []serv.Menu
 	GetCafeByID(id int) serv.Cafe
 	GetCategoriesByCafeID(id int) []string
+	GetCafe(id int, password string) (serv.Cafe, error)
+	CafeGenerateToken(id int, password string) (string, error)
 }
 
 type TGBot interface {

@@ -15,6 +15,12 @@ func NewCafePostgres(db *gorm.DB) *CafePostgres {
 	}
 }
 
+func (r *CafePostgres) GetCafe(id int, password string) (serv.Cafe, error) {
+	var cafe serv.Cafe
+	err := r.db.Table("cafes").Where("id_cafes=? and password=?", id, password).Take(&cafe).Error
+	return cafe, err
+}
+
 func (r *CafePostgres) GetCafeList() []serv.Cafe {
 	var cafes []serv.Cafe
 	r.db.Table("cafes").Find(&cafes)

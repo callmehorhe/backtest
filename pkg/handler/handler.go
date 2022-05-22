@@ -27,6 +27,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			auth.POST("/sign-up", h.signUp)
 			auth.POST("/sign-in", h.signIn)
 			auth.GET("/sign-out", h.signOut)
+			auth.POST("/sign-in-cafe", h.signInCafe)
 
 		}
 		api := slash.Group("/api", h.Auth)

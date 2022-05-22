@@ -17,6 +17,7 @@ type CafeList interface {
 	GetCafeByID(id int) serv.Cafe
 	AddChatId(cafe_id int, chat_id int64)
 	GetCategoriesByCafeID(id int) []string
+	GetCafe(id int, password string) (serv.Cafe, error)
 }
 
 type Orders interface {

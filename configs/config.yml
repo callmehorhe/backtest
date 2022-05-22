@@ -1,4 +1,4 @@
-port: ":8000"
+port: ":8080"
 
 db:
   username: "postgres"
@@ -11,4 +11,4 @@ email:
   host: "smtp.mail.ru"
   port: "465"
   username: "reg_deliveryhouse@mail.ru"
-  password: "wjVC1MJX7zWgH2ZRgKv2"
+  password: "taWirQc3BtQmxTfdLXnp"

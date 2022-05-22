@@ -22,7 +22,7 @@ func NewEmailService() *EmailService {
 	username := viper.GetString("email.username")
 	password := viper.GetString("email.password")
 	auth := smtp.PlainAuth("", username, password, host)
-	from := mail.Address{Name: "Delivery", Address: "reg_deliveryhouse@mail.ru"}
+	from := mail.Address{Name: "Delivery", Address: username}
 	headers := make(map[string]string)
 	headers["From"] = from.String()
 

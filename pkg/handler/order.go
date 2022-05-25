@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"strconv"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/gin-gonic/gin"
 	_ "gorm.io/driver/postgres"
 )
 
 func (h *Handler) orderSend(c *gin.Context) {
-	var input serv.Order
+	var input models.Order
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid request")
 		return

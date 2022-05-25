@@ -1,30 +1,33 @@
 package repository
 
 import (
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"gorm.io/gorm"
 )
 
 type Authorization interface {
-	CreateUser(user serv.User) (int, error)
-	GetUser(username, password string) (serv.User, error)
-	GetUserById(id int) (serv.User, error)
+	CreateUser(user models.User) (int, error)
+	GetUser(username, password string) (models.User, error)
+	GetUserById(id int) (models.User, error)
 }
 
 type CafeList interface {
-	GetCafeList() []serv.Cafe
-	GetMenuByCafeID(id int) []serv.Menu
-	GetCafeByID(id int) serv.Cafe
+	GetCafeList() []models.Cafe
+	GetMenuByCafeID(id int) []models.Menu
+	GetCafeByID(id int) models.Cafe
 	AddChatId(cafe_id int, chat_id int64)
 	GetCategoriesByCafeID(id int) []string
-	GetCafe(id int, password string) (serv.Cafe, error)
+	GetCafe(id int, password string) (models.Cafe, error)
+	UpdateCafe(cafe models.Cafe) error
+	CreatePos(menu models.Menu)
+	UpdatePos(menu models.Menu)
 }
 
 type Orders interface {
-	CreateOrder(order serv.Order) int
-	UpdateOrder(order serv.Order) serv.Order
-	GetOrderByID(id int) serv.Order
-	GetOrdersByUser(id int) []serv.Order
+	CreateOrder(order models.Order) int
+	UpdateOrder(order models.Order) models.Order
+	GetOrderByID(id int) models.Order
+	GetOrdersByUser(id int) []models.Order
 	GetCafeNameByID(id int) string
 }
 

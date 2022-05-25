@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
 )
 
@@ -18,11 +18,11 @@ func NewOrderService(repo repository.Orders) *OrderService {
 	}
 }
 
-func (s *OrderService) GetOrdersByUser(id int) []serv.Order {
+func (s *OrderService) GetOrdersByUser(id int) []models.Order {
 	orders := s.repo.GetOrdersByUser(id)
 	for i := 0; i < len(orders); i++ {
 		orders[i].Cafe_Name = s.repo.GetCafeNameByID(orders[i].Cafe_Id)
-		pos := []serv.Position{}
+		pos := []models.Position{}
 		if err := json.Unmarshal(orders[i].Order_list, &pos); err != nil {
 			log.Fatal(err)
 		}

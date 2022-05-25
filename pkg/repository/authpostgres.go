@@ -1,7 +1,7 @@
 package repository
 
 import (
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"gorm.io/gorm"
 )
 
@@ -15,7 +15,7 @@ func NewAuthPostgres(db *gorm.DB) *AuthPostgres {
 	}
 }
 
-func (r *AuthPostgres) CreateUser(user serv.User) (int, error) {
+func (r *AuthPostgres) CreateUser(user models.User) (int, error) {
 	var id int
 	row := r.db.Create(&user)
 	if err := row.Error; err != nil {
@@ -25,16 +25,16 @@ func (r *AuthPostgres) CreateUser(user serv.User) (int, error) {
 	return id, nil
 }
 
-func (r *AuthPostgres) GetUser(email, password string) (serv.User, error) {
-	var user serv.User
+func (r *AuthPostgres) GetUser(email, password string) (models.User, error) {
+	var user models.User
 	user.Email = email
 	user.Password = password
 	err := r.db.Select("id_user").Where("email=? AND password=?", email, password).Take(&user).Error
 	return user, err
 }
 
-func (r *AuthPostgres) GetUserById(id int) (serv.User, error) {
-	var user serv.User
+func (r *AuthPostgres) GetUserById(id int) (models.User, error) {
+	var user models.User
 	err := r.db.Where("id_user=?", id).First(&user).Error
 	return user, err
 

@@ -5,12 +5,12 @@ import (
 	"strconv"
 	"time"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) signUp(c *gin.Context) {
-	var input serv.User
+	var input models.User
 
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid input body")

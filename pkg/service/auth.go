@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"time"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -34,7 +34,7 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 	}
 }
 
-func (s *AuthService) CreateUser(user serv.User) (int, error) {
+func (s *AuthService) CreateUser(user models.User) (int, error) {
 	rand.Seed(time.Now().UnixNano())
 	pass := ""
 	for i := 0; i < 8; i++ {
@@ -54,7 +54,7 @@ func (s *AuthService) CreateUser(user serv.User) (int, error) {
 	return id, nil
 }
 
-func (s *AuthService) GetUserByID(id int) (serv.User, error) {
+func (s *AuthService) GetUserByID(id int) (models.User, error) {
 	return s.repo.GetUserById(id)
 }
 
@@ -74,7 +74,7 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *AuthService) GetUser(email, password string) (serv.User, error) {
+func (s *AuthService) GetUser(email, password string) (models.User, error) {
 	return s.repo.GetUser(email, geneartePasswordHash(password))
 }
 func (s *AuthService) ParseToken(accessToken string) (int, error) {

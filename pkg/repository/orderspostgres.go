@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"time"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -19,7 +19,7 @@ func NewOrderPostgres(db *gorm.DB) *OrderPostgres {
 	}
 }
 
-func (r *OrderPostgres) CreateOrder(order serv.Order) int {
+func (r *OrderPostgres) CreateOrder(order models.Order) int {
 	var id int
 
 	j, _ := json.Marshal(order.Positions)
@@ -34,9 +34,9 @@ func (r *OrderPostgres) CreateOrder(order serv.Order) int {
 	return id
 }
 
-func (r *OrderPostgres) UpdateOrder(order serv.Order) serv.Order {
+func (r *OrderPostgres) UpdateOrder(order models.Order) models.Order {
 	id := order.Order_ID
-	updatedOrder := serv.Order{
+	updatedOrder := models.Order{
 		User_ID:    order.User_ID,
 		Cafe_Id:    order.Cafe_Id,
 		Order_date: order.Order_date,
@@ -49,14 +49,14 @@ func (r *OrderPostgres) UpdateOrder(order serv.Order) serv.Order {
 	return updatedOrder
 }
 
-func (r *OrderPostgres) GetOrderByID(id int) serv.Order {
-	var order serv.Order
+func (r *OrderPostgres) GetOrderByID(id int) models.Order {
+	var order models.Order
 	r.db.Table("orders").Where("order_id=?", id).Take(&order)
 	return order
 }
 
-func (r *OrderPostgres) GetOrdersByUser(id int) []serv.Order {
-	var orders []serv.Order
+func (r *OrderPostgres) GetOrdersByUser(id int) []models.Order {
+	var orders []models.Order
 	r.db.Table("orders").Where("user_id=?", id).Order("order_id desc").Find(&orders)
 	return orders
 }

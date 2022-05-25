@@ -3,7 +3,7 @@ package service
 import (
 	"time"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
 	"github.com/dgrijalva/jwt-go"
 )
@@ -18,7 +18,7 @@ func NewCafeService(repo repository.CafeList) *CafeService {
 	}
 }
 
-func (s *CafeService) GetCafe(id int, password string) (serv.Cafe, error) {
+func (s *CafeService) GetCafe(id int, password string) (models.Cafe, error) {
 	return s.repo.GetCafe(id, password)
 }
 
@@ -38,15 +38,15 @@ func (s *CafeService) CafeGenerateToken(id int, password string) (string, error)
 	return token.SignedString([]byte(signingKey))
 }
 
-func (s *CafeService) GetCafeList() []serv.Cafe {
+func (s *CafeService) GetCafeList() []models.Cafe {
 	return s.repo.GetCafeList()
 }
 
-func (s *CafeService) GetMenuByCafeID(id int) []serv.Menu {
+func (s *CafeService) GetMenuByCafeID(id int) []models.Menu {
 	return s.repo.GetMenuByCafeID(id)
 }
 
-func (s *CafeService) GetCafeByID(id int) serv.Cafe {
+func (s *CafeService) GetCafeByID(id int) models.Cafe {
 	return s.repo.GetCafeByID(id)
 }
 

@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
-func (b *Bot) SendOrder(order serv.Order) {
+func (b *Bot) SendOrder(order models.Order) {
 	if order.Phone == "" {
 		user, _ := b.repo.GetUserById(order.User_ID)
 		order.Phone = user.Phone

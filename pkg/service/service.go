@@ -1,18 +1,18 @@
 package service
 
 import (
-	serv "github.com/callmehorhe/backtest"
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
 	"github.com/callmehorhe/backtest/pkg/service/telegram"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
 type Authorization interface {
-	CreateUser(user serv.User) (int, error)
+	CreateUser(user models.User) (int, error)
 	GenerateToken(email, password string) (string, error)
 	ParseToken(accessToken string) (int, error)
-	GetUser(email, password string) (serv.User, error)
-	GetUserByID(id int) (serv.User, error)
+	GetUser(email, password string) (models.User, error)
+	GetUserByID(id int) (models.User, error)
 }
 
 type EmailSendler interface {
@@ -20,22 +20,24 @@ type EmailSendler interface {
 }
 
 type CafeList interface {
-	GetCafeList() []serv.Cafe
-	GetMenuByCafeID(id int) []serv.Menu
-	GetCafeByID(id int) serv.Cafe
+	GetCafeList() []models.Cafe
+	GetMenuByCafeID(id int) []models.Menu
+	GetCafeByID(id int) models.Cafe
 	GetCategoriesByCafeID(id int) []string
-	GetCafe(id int, password string) (serv.Cafe, error)
+	GetCafe(id int, password string) (models.Cafe, error)
 	CafeGenerateToken(id int, password string) (string, error)
+	UpdateCafe(cafe models.Cafe) error
+	UpdateMenu(menu []models.Menu)
 }
 
 type TGBot interface {
 	Start() error
 	HandleMessge(message *tgbotapi.Message)
-	SendOrder(order serv.Order)
+	SendOrder(order models.Order)
 }
 
 type Order interface {
-	GetOrdersByUser(id int) []serv.Order
+	GetOrdersByUser(id int) []models.Order
 }
 
 type Service struct {

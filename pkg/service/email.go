@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/mail"
 	"net/smtp"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -20,7 +21,7 @@ func NewEmailService() *EmailService {
 	port := viper.GetString("email.port")
 	servername := host + ":" + port
 	username := viper.GetString("email.username")
-	password := viper.GetString("email.password")
+	password := os.Getenv("EMAIL_PASSWORD")
 	auth := smtp.PlainAuth("", username, password, host)
 	from := mail.Address{Name: "Delivery", Address: username}
 	headers := make(map[string]string)

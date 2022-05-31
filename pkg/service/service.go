@@ -27,7 +27,7 @@ type CafeList interface {
 	GetCafe(id int, password string) (models.Cafe, error)
 	CafeGenerateToken(id int, password string) (string, error)
 	UpdateCafe(cafe models.Cafe) error
-	UpdateMenu(menu []models.Menu)
+	UpdateMenu(menu []models.Menu, cafe string)
 }
 
 type TGBot interface {

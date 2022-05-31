@@ -53,18 +53,21 @@ func (r *CafePostgres) UpdateCafe(cafe models.Cafe) error {
 	return r.db.Table("cafes").Where("id_cafe=?", cafe.Id_Cafe).Updates(&cafe).Error
 }
 
-func (r *CafePostgres) CreatePos(menu models.Menu){
+func (r *CafePostgres) CreatePos(menu models.Menu) {
 	m := models.Menu{
-		Id_Cafe: menu.Id_Cafe,
-		Name: menu.Name,
-		Image: menu.Image,
-		Price: menu.Price,
+		Id_Cafe:  menu.Id_Cafe,
+		Name:     menu.Name,
+		Image:    menu.Image,
+		Price:    menu.Price,
 		Category: menu.Category,
-
 	}
 	r.db.Table("menu").Create(&m)
 }
 
-func (r *CafePostgres) UpdatePos( menu models.Menu){
+func (r *CafePostgres) UpdatePos(menu models.Menu) {
 	r.db.Table("menu").Where("id_menu=?", menu.Id_Menu).Updates(&menu)
+}
+
+func (r *CafePostgres) DeletePos(id []int) {
+	r.db.Table("menu").Delete(&models.Menu{}, id)
 }

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -40,11 +41,10 @@ func (h *Handler) getMenuByCafeID(c *gin.Context) {
 		newErrorResponse(c, http.StatusInternalServerError, "menu is empty")
 		return
 	}
-
+	log.Print("cafe", cafe)
 	nameAndMenu := &models.CafeAndMenu{
-		Cafe_Name:  cafe.Name,
-		Categories: categories,
-		Menu:       dish_List,
+		Cafe: cafe,
+		Menu: dish_List,
 	}
 	c.JSON(http.StatusOK, nameAndMenu)
 }

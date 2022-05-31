@@ -54,8 +54,8 @@ func (h *Handler) signInCafe(c *gin.Context) {
 }
 
 type CafeProperties struct {
-	Cafe models.Cafe
-	Menu []models.Menu
+	Cafe models.Cafe   `json:"cafe"`
+	Menu []models.Menu `json:"menu"`
 }
 
 func (h *Handler) changeMenu(c *gin.Context) {
@@ -63,11 +63,10 @@ func (h *Handler) changeMenu(c *gin.Context) {
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "invalid input")
 	}
-
 	err := h.services.CafeList.UpdateCafe(input.Cafe)
 	if err != nil {
 		newErrorResponse(c, http.StatusBadRequest, "invalid write to db")
 	}
-	h.services.CafeList.UpdateMenu(input.Menu)
+	h.services.CafeList.UpdateMenu(input.Menu, input.Cafe.Name)
 	c.Status(http.StatusOK)
 }

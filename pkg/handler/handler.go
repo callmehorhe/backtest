@@ -19,7 +19,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	router.Use(CORSMiddleware)
-
+	router.Static("/images", "./images")
 	slash := router.Group("/")
 	{
 		auth := slash.Group("/auth")
@@ -36,10 +36,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			{
 				cafes.GET("/", h.getCafeList)
 				cafes.GET("/:id", h.getMenuByCafeID)
-				admin := cafes.Group("/admin")
-				{
-					admin.POST("/", h.changeMenu)
-				}
+				cafes.POST("/admin", h.changeMenu)
 			}
 			api.GET("/user/:id", h.userProfile)
 			api.POST("/order", h.orderSend)

@@ -21,6 +21,7 @@ type CafeList interface {
 	UpdateCafe(cafe models.Cafe) error
 	CreatePos(menu models.Menu)
 	UpdatePos(menu models.Menu)
+	DeletePos(id []int)
 }
 
 type Orders interface {

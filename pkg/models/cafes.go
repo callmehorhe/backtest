@@ -27,7 +27,7 @@ type Category struct {
 }
 
 type CafeAndMenu struct {
-	Cafe_Name  string   `json:"name"`
+	Cafe       Cafe     `json:"cafe"`
 	Categories []string `json:"categories"`
 	Menu       []Menu   `json:"menu"`
 }

@@ -12,6 +12,7 @@ import (
 
 func SaveImage(data, path string) {
 	path = "./images/" + path
+	data = data[23:]
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(data))
 	m, _, err := image.Decode(reader)
 	if err != nil {

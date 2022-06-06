@@ -43,8 +43,9 @@ func (h *Handler) getMenuByCafeID(c *gin.Context) {
 	}
 	log.Print("cafe", cafe)
 	nameAndMenu := &models.CafeAndMenu{
-		Cafe: cafe,
-		Menu: dish_List,
+		Cafe:       cafe,
+		Categories: categories,
+		Menu:       dish_List,
 	}
 	c.JSON(http.StatusOK, nameAndMenu)
 }

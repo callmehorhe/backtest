@@ -40,7 +40,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 			}
 			api.GET("/user/:id", h.userProfile)
 			api.POST("/order", h.orderSend)
-			api.GET("/orders/:id", h.getOrderList)
+			api.GET("/orders/:id/:page", h.getOrderList)
 		}
 	}
 

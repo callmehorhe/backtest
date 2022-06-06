@@ -37,7 +37,8 @@ type TGBot interface {
 }
 
 type Order interface {
-	GetOrdersByUser(id int) []models.Order
+	GetOrdersByUser(id, count int) []models.Order
+	GetPagesCount(id int) int
 }
 
 type Service struct {

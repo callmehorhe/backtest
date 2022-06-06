@@ -28,8 +28,9 @@ type Orders interface {
 	CreateOrder(order models.Order) int
 	UpdateOrder(order models.Order) models.Order
 	GetOrderByID(id int) models.Order
-	GetOrdersByUser(id int) []models.Order
+	GetOrdersByUser(id, cafe int) []models.Order
 	GetCafeNameByID(id int) string
+	GetOrdersCount(id int) int
 }
 
 type Repository struct {

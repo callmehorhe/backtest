@@ -55,9 +55,9 @@ func (r *OrderPostgres) GetOrderByID(id int) models.Order {
 	return order
 }
 
-func (r *OrderPostgres) GetOrdersByUser(id int) []models.Order {
+func (r *OrderPostgres) GetOrdersByUser(id, count int) []models.Order {
 	var orders []models.Order
-	r.db.Table("orders").Where("user_id=?", id).Order("order_id desc").Find(&orders)
+	r.db.Table("orders").Where("user_id=?", id).Order("order_id desc").Offset((count - 1) * 10).Limit(10).Find(&orders)
 	return orders
 }
 
@@ -65,4 +65,10 @@ func (r *OrderPostgres) GetCafeNameByID(id int) string {
 	var name string
 	r.db.Table("cafes").Select("name").Where("id_cafe=?", id).Take(&name)
 	return name
+}
+
+func (r *OrderPostgres) GetOrdersCount(id int) int {
+	var count int64
+	r.db.Table("orders").Where("user_id=?", id).Count(&count)
+	return int(count)
 }

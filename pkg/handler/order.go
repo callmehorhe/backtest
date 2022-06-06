@@ -20,12 +20,26 @@ func (h *Handler) orderSend(c *gin.Context) {
 	c.AbortWithStatus(http.StatusOK)
 }
 
+type orderAndPage struct {
+	PageCount int            `json:"pageCount"`
+	Orders    []models.Order `json:"orders"`
+}
+
 func (h *Handler) getOrderList(c *gin.Context) {
 	user_id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, "wrong request")
 		return
 	}
-	orders := h.services.Order.GetOrdersByUser(user_id)
-	c.JSON(http.StatusOK, orders)
+	currentPage, err := strconv.Atoi(c.Param("page"))
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "wrong request")
+		return
+	}
+	orders := h.services.Order.GetOrdersByUser(user_id, currentPage)
+	pages := h.services.Order.GetPagesCount(user_id)
+	c.JSON(http.StatusOK, &orderAndPage{
+		PageCount: pages,
+		Orders:    orders,
+	})
 }

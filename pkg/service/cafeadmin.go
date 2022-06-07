@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/callmehorhe/backtest/pkg/models"
 )
@@ -20,7 +21,7 @@ func (s *CafeService) UpdateMenu(menu []models.Menu, cafe string) {
 	var del []int
 	for _, pos := range menu {
 		if pos.BaseImage != "" {
-			path := fmt.Sprintf("%s/%s.jpg", cafe, pos.Name)
+			path := strings.ReplaceAll(fmt.Sprintf("%s/%s.jpg", cafe, pos.Name), " ", "")
 			SaveImage(pos.BaseImage, path)
 			pos.Image = "http://92.38.128.91:8000/images/" + path
 		}

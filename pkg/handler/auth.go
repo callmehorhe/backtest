@@ -90,3 +90,13 @@ func (h *Handler) userProfile(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, user)
 }
+
+func (h *Handler) confirm(c *gin.Context) {
+	code := c.Param("code")
+	err := h.services.Authorization.ConfirmUser(code)
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "wrong activation")
+		return
+	}
+	c.Status(http.StatusOK)
+}

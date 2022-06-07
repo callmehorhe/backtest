@@ -13,6 +13,7 @@ type Authorization interface {
 	ParseToken(accessToken string) (int, error)
 	GetUser(email, password string) (models.User, error)
 	GetUserByID(id int) (models.User, error)
+	ConfirmUser(code string) error
 }
 
 type EmailSendler interface {

@@ -36,17 +36,17 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 
 func (s *AuthService) CreateUser(user models.User) (int, error) {
 	rand.Seed(time.Now().UnixNano())
-	pass := ""
-	for i := 0; i < 8; i++ {
-		pass += string(passwordLetters[rand.Intn(82)])
+	auth := ""
+	for i := 0; i < 20; i++ {
+		auth += string(passwordLetters[rand.Intn(82)])
 	}
-
-	user.Password = geneartePasswordHash(pass)
+	user.Confirm = auth
+	user.Password = geneartePasswordHash(user.Password)
 	id, err := s.repo.CreateUser(user)
 	if err != nil {
 		return 0, err
 	}
-	text := "Ваш пароль:\n    " + pass + "\nНикому не передавайте пароль!"
+	text := fmt.Sprintf("Ссылка для подтверждения:\nhttp://dhouse-it.ru/confirm/%s", user.Confirm)
 	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
 		return 0, err
 	}
@@ -55,7 +55,11 @@ func (s *AuthService) CreateUser(user models.User) (int, error) {
 }
 
 func (s *AuthService) GetUserByID(id int) (models.User, error) {
-	return s.repo.GetUserById(id)
+	user, err := s.repo.GetUserById(id)
+	if err != nil || user.Confirm != "" {
+		return models.User{}, err
+	}
+	return user, nil
 }
 
 func (s *AuthService) GenerateToken(email, password string) (string, error) {
@@ -77,6 +81,7 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 func (s *AuthService) GetUser(email, password string) (models.User, error) {
 	return s.repo.GetUser(email, geneartePasswordHash(password))
 }
+
 func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &tokenClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -102,4 +107,8 @@ func geneartePasswordHash(password string) string {
 	hash.Write([]byte(password))
 
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
+}
+
+func (s *AuthService) ConfirmUser(code string) error {
+	return s.repo.ConfirmUser(code)
 }

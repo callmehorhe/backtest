@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS public.cafes
     phone character varying(255) COLLATE pg_catalog."default" NOT NULL,
     image character varying(255) COLLATE pg_catalog."default" NOT NULL,
     address character varying(255) COLLATE pg_catalog."default" NOT NULL,
-    id_menu integer NOT NULL,
+    Chat_ID bigint,
+    Password varchar(255),
     CONSTRAINT cafes_pkey PRIMARY KEY (id_cafe),
     CONSTRAINT cafes_name_key UNIQUE (name),
     CONSTRAINT cafes_phone_key UNIQUE (phone)
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.cafes
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.cafes
-    OWNER to postgres;
+    OWNER to delivery;
 
 insert into cafes values
 (1, 'Шашлычный двор', '+79298011111', 'https://i.ibb.co/8891w7s/image.png', 'ул. Ивана Иванова 1', 1),
@@ -47,22 +48,23 @@ CREATE TABLE IF NOT EXISTS public.menu
 	id_menu serial PRIMARY KEY,
     id_cafe int references public.cafes(id_cafe)  NOT NULL,
 	name varchar(255) NOT NULL,
-	price int NOT NULL,
-	image varchar(255) not null
+    price int NOT NULL,
+    image varchar(255) not null,
+	category varchar(255)
 )
 
 TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.menu
-    OWNER to postgres;
+    OWNER to delivery;
 
 insert into public.menu values
-(1, 1, 'Гамбургер', 250, 'https://i.ibb.co/vX1Kt4g/p-O.jpg'),
-(2, 1, 'Чизбургер', '250', '...', 'Бургеры'),
-(3, 1, 'Таук', '220', '...', 'Шаурма/Таук'),
-(4, 1, 'Таук экстра', '260', '...', 'Шаурма/Таук'),
-(5, 1, 'Шаурма', '220', '...', 'Шаурма/Таук'),
-(6, 1, 'Шаурма экстра', '260', '...', 'Шаурма/Таук');
+(1, 1, 'Гамбургер', 250, 'https://i.ibb.co/vX1Kt4g/p-O.jpg', 'fast food'),
+(2, 1, 'Чизбургер', 250, '...', 'Бургеры'),
+(3, 1, 'Таук', 220, '...', 'Шаурма/Таук'),
+(4, 1, 'Таук экстра', 260, '...', 'Шаурма/Таук'),
+(5, 1, 'Шаурма', 220, '...', 'Шаурма/Таук'),
+(6, 1, 'Шаурма экстра', 260, '...', 'Шаурма/Таук');
 
 CREATE TABLE IF NOT EXISTS public.orders
 (
@@ -74,7 +76,8 @@ CREATE TABLE IF NOT EXISTS public.orders
 	order_list jsonb NOT NULL,
 	address varchar(255),
 	phone varchar(255),
-	status_accepted bool,
-	status_sent bool,
-	status_canceled bool
+	status varchar(255)
 );
+
+ALTER TABLE IF EXISTS public.orders
+    OWNER to delivery;

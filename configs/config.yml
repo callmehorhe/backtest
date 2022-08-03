@@ -1,13 +1,16 @@
 port: ":8080"
 
 db:
-  username: "postgres"
+  username: "delivery"
   host: "localhost"
   port: "5432"
   dbname: "delivery"
+  password: "itcenter2022"
   sslmode: "disable"
 
 email:
   host: "smtp.mail.ru"
   port: "465"
   username: "reg_deliveryhouse@mail.ru"
+
+api_token: "5177525531:AAGrpG6DlSkCBx14USBy5pq-WHf3y2XBZjw"

@@ -1,0 +1,1 @@
+pg_dump -U postgres -W -E UTF8 -d dbname -f dbname.sql

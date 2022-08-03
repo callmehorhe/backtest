@@ -33,7 +33,7 @@ func (b *Bot) SendOrder(order models.Order) {
 		text += fmt.Sprintf("%d: %s - %d шт.\n", i+1, order.Positions[i].Name, order.Positions[i].Count)
 		order.Cost += order.Positions[i].Count * order.Positions[i].Price
 	}
-	if order.Address != "" {
+	if order.Address != "Навынос" {
 		text += "Доставка: 100р\n"
 		order.Cost += 100
 	}

@@ -31,7 +31,7 @@ func (r *AuthPostgres) GetUser(email, password string) (models.User, error) {
 	var user models.User
 	user.Email = email
 	user.Password = password
-	err := r.db.Select("id_user").Where("email=? AND password=? AND confirm=?", email, password, "").Take(&user).Error
+	err := r.db.Select("id_user, phone").Where("email=? AND password=? AND confirm=?", email, password, "").Take(&user).Error
 	return user, err
 }
 

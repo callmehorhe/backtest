@@ -5,13 +5,14 @@ import (
 	"strings"
 
 	"github.com/callmehorhe/backtest/pkg/models"
+	"github.com/spf13/viper"
 )
 
 func (s *CafeService) UpdateCafe(cafe models.Cafe) error {
 	if cafe.BaseImage != "" {
-		path := fmt.Sprintf("%s/%s.jpg", cafe.Name, cafe.Name)
+		path := strings.ReplaceAll(fmt.Sprintf("%s/%s.jpg", cafe.Name, cafe.Name), " ", "")
 		SaveImage(cafe.BaseImage, path)
-		cafe.Image = "http://92.38.128.91:8000/images/" + path
+		cafe.Image = "http://92.63.104.228" + viper.GetString("port") + "/images/" + path
 	}
 	return s.repo.UpdateCafe(cafe)
 }
@@ -23,7 +24,7 @@ func (s *CafeService) UpdateMenu(menu []models.Menu, cafe string) {
 		if pos.BaseImage != "" {
 			path := strings.ReplaceAll(fmt.Sprintf("%s/%s.jpg", cafe, pos.Name), " ", "")
 			SaveImage(pos.BaseImage, path)
-			pos.Image = "http://92.38.128.91:8000/images/" + path
+			pos.Image = "http://92.63.104.228" + viper.GetString("port") + "/images/" + path
 		}
 		if pos.Id_Menu < 0 {
 			s.repo.CreatePos(pos)

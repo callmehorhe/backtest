@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"math/rand"
+	"strings"
 	"time"
 
 	"github.com/callmehorhe/backtest/pkg/models"
@@ -35,6 +36,9 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (s *AuthService) CreateUser(user models.User) (int, error) {
+	if len(user.Password) < 8 {
+		return 0, errors.New("password too short")
+	}
 	rand.Seed(time.Now().UnixNano())
 	auth := ""
 	for i := 0; i < 20; i++ {
@@ -42,6 +46,7 @@ func (s *AuthService) CreateUser(user models.User) (int, error) {
 	}
 	user.Confirm = auth
 	user.Password = geneartePasswordHash(user.Password)
+	user.Email = strings.ToLower(user.Email)
 	id, err := s.repo.CreateUser(user)
 	if err != nil {
 		return 0, err
@@ -79,6 +84,7 @@ func (s *AuthService) GenerateToken(email, password string) (string, error) {
 }
 
 func (s *AuthService) GetUser(email, password string) (models.User, error) {
+	email = strings.ToLower(email)
 	return s.repo.GetUser(email, geneartePasswordHash(password))
 }
 

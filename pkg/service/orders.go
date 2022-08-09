@@ -2,11 +2,11 @@ package service
 
 import (
 	"encoding/json"
-	"log"
 	"math"
 
 	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
+	"github.com/sirupsen/logrus"
 )
 
 type OrderService struct {
@@ -25,7 +25,7 @@ func (s *OrderService) GetOrdersByUser(id, count int) []models.Order {
 		orders[i].Cafe_Name = s.repo.GetCafeNameByID(orders[i].Cafe_Id)
 		pos := []models.Position{}
 		if err := json.Unmarshal(orders[i].Order_list, &pos); err != nil {
-			log.Fatal(err)
+			logrus.Error(err)
 		}
 		orders[i].Positions = pos
 	}

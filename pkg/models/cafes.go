@@ -12,13 +12,16 @@ type Cafe struct {
 }
 
 type Menu struct {
-	Id_Menu   int    `json:"id"          gorm:"primary_key;type:serial"`
-	Id_Cafe   int    `json:"id_cafe"     gorm:"type:varchar(255)"`
-	Name      string `json:"productName" gorm:"type:varchar(255)"`
-	Image     string `json:"img"         gorm:"type:varchar(255)"`
-	BaseImage string `json:"baseimg"     gorm:"-"`
-	Price     int    `json:"cost"        gorm:"type:integer"`
-	Category  string `json:"category"    gorm:"type:varchar(255)"`
+	Id_Menu     int    `json:"id"          gorm:"primary_key;type:serial"`
+	Id_Cafe     int    `json:"id_cafe"     gorm:"type:varchar(255)"`
+	Name        string `json:"productName" gorm:"type:varchar(255)"`
+	Image       string `json:"img"         gorm:"type:varchar(255)"`
+	BaseImage   string `json:"baseimg"     gorm:"-"`
+	Price       int    `json:"cost"        gorm:"type:integer"`
+	Category    string `json:"category"    gorm:"type:varchar(255)"`
+	Description string `json:"desc"        gorm:"type:varchar(255)"`
+	Weight      int    `json:"weight"      gorm:"type:integer"`
+	Avaible     bool   `json:"avaible"     gorm:"type:boolean"`
 }
 
 type Category struct {

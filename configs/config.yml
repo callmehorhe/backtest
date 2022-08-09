@@ -1,11 +1,12 @@
 port: ":8080"
+host: "92.63.104.228"
 
 db:
-  username: "delivery"
+  username: "postgres"
   host: "localhost"
   port: "5432"
-  dbname: "delivery"
-  password: "itcenter2022"
+  dbname: "postgres"
+  password: "123456"
   sslmode: "disable"
 
 email:

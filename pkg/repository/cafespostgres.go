@@ -55,11 +55,14 @@ func (r *CafePostgres) UpdateCafe(cafe models.Cafe) error {
 
 func (r *CafePostgres) CreatePos(menu models.Menu) {
 	m := models.Menu{
-		Id_Cafe:  menu.Id_Cafe,
-		Name:     menu.Name,
-		Image:    menu.Image,
-		Price:    menu.Price,
-		Category: menu.Category,
+		Id_Cafe:     menu.Id_Cafe,
+		Name:        menu.Name,
+		Image:       menu.Image,
+		Price:       menu.Price,
+		Category:    menu.Category,
+		Description: menu.Description,
+		Weight:      menu.Weight,
+		Avaible:     menu.Avaible,
 	}
 	r.db.Table("menu").Create(&m)
 }

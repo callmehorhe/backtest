@@ -88,6 +88,7 @@ func (b *Bot) Accept(chat_ID int64, id int) {
 	order.Status = "accepted"
 	b.repo.Orders.UpdateOrder(order)
 	b.SendMessage(chat_ID, fmt.Sprintf("✔️Заказ №%d подтвержден!", id))
+	b.driverBot.NewOrder(order)
 }
 
 func (b *Bot) Send(chat_ID int64, id int) {

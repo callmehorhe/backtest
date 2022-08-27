@@ -4,7 +4,6 @@ import (
 	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
 	"github.com/callmehorhe/backtest/pkg/service/telegram"
-	"github.com/callmehorhe/backtest/pkg/service/telegramdrivers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
 )
 
@@ -38,11 +37,6 @@ type TGBot interface {
 	SendOrder(order models.Order) (models.Order, error)
 }
 
-type TGBotDrivers interface {
-	Start() error
-	NewOrder(order models.Order)
-}
-
 type Order interface {
 	GetOrdersByUser(id, count int) []models.Order
 	GetPagesCount(id int) int
@@ -53,7 +47,6 @@ type Service struct {
 	EmailSendler
 	CafeList
 	TGBot
-	TGBotDrivers
 	Order
 }
 
@@ -62,8 +55,7 @@ func NewService(repos *repository.Repository, bot, driverBot *tgbotapi.BotAPI) *
 		Authorization: NewAuthService(repos.Authorization),
 		EmailSendler:  NewEmailService(),
 		CafeList:      NewCafeService(repos.CafeList),
-		TGBot:         telegram.NewBotService(*repos, bot),
-		TGBotDrivers:  telegramdrivers.NewBotService(*repos, driverBot),
+		TGBot:         telegram.NewBotService(*repos, bot, driverBot),
 		Order:         NewOrderService(repos.Orders),
 	}
 }

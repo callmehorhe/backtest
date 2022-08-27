@@ -45,7 +45,6 @@ func main() {
 	services := service.NewService(repos, tgBot, tgDriverBot)
 	handlers := handler.NewHandler(services)
 	go services.TGBot.Start()
-	go services.TGBotDrivers.Start()
 
 	srv := serv.Server{}
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {

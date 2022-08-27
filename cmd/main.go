@@ -37,10 +37,15 @@ func main() {
 	if err != nil {
 		logrus.Fatal("cant launch bot")
 	}
+	tgDriverBot, err := tgbotapi.NewBotAPI("5527799879:AAFuVJfwGqKAcAmYFm7GKDNAjWsg_Dtpsko")
+	if err != nil {
+		logrus.Fatal("cant launch bot")
+	}
 	repos := repository.NewRepository(db)
-	services := service.NewService(repos, tgBot)
+	services := service.NewService(repos, tgBot, tgDriverBot)
 	handlers := handler.NewHandler(services)
 	go services.TGBot.Start()
+	go services.TGBotDrivers.Start()
 
 	srv := serv.Server{}
 	if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {

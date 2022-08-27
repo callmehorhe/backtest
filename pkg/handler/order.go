@@ -15,8 +15,13 @@ func (h *Handler) orderSend(c *gin.Context) {
 		newErrorResponse(c, http.StatusBadRequest, "invalid request")
 		return
 	}
-	h.services.TGBot.SendOrder(input)
-
+	order, err := h.services.TGBot.SendOrder(input)
+	if err != nil {
+		c.AbortWithStatus(http.StatusInternalServerError)
+	}
+	if order.Address != "Навынос" {
+		h.services.TGBotDrivers.NewOrder(order)
+	}
 	c.AbortWithStatus(http.StatusOK)
 }
 

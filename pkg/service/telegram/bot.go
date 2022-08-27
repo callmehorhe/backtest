@@ -9,6 +9,7 @@ import (
 type Bot struct {
 	bot *tgbotapi.BotAPI
 	repo repository.Repository
+	
 }
 
 func NewBotService(repo repository.Repository, bot *tgbotapi.BotAPI) *Bot {

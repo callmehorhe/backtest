@@ -7,9 +7,10 @@ import (
 
 	"github.com/callmehorhe/backtest/pkg/models"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/sirupsen/logrus"
 )
 
-func (b *Bot) SendOrder(order models.Order) {
+func (b *Bot) SendOrder(order models.Order) (models.Order, error) {
 	if order.Phone == "" {
 		user, _ := b.repo.GetUserById(order.User_ID)
 		order.Phone = user.Phone
@@ -17,7 +18,7 @@ func (b *Bot) SendOrder(order models.Order) {
 
 	id := b.repo.Orders.CreateOrder(order)
 	cafe := b.repo.GetCafeByID(order.Cafe_Id)
-
+	order.Cafe_Name = cafe.Name
 	//Сообщение телеграмм бота
 	text := fmt.Sprintf("Заказ №%d\n%s\n", id, cafe.Name)
 	if order.Address != "" {
@@ -52,11 +53,14 @@ func (b *Bot) SendOrder(order models.Order) {
 	)
 	msg := tgbotapi.NewMessage(cafe.Chat_ID, text)
 	msg.ReplyMarkup = nKeyboard
-	b.bot.Send(msg)
-	//
+	_, err := b.bot.Send(msg)
+	if err != nil {
+		logrus.Errorf("cant send message to tgDeliveryBot, %v", err)
+		return models.Order{}, err
+	}
 
 	order.Order_ID = id
-	b.repo.UpdateOrder(order)
+	return b.repo.UpdateOrder(order), nil
 }
 
 func (b *Bot) CallbackHandler(callback tgbotapi.CallbackQuery) {

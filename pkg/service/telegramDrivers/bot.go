@@ -43,7 +43,6 @@ func (b *BotDrivers) initUpdateChannel() (tgbotapi.UpdatesChannel, error) {
 
 func (b *BotDrivers) handleUpdates(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
-		logrus.Print("drivers: %+v", drivers)
 		if update.Message != nil { // ignore any non-Message Updates
 			isNew := true
 			for i := 0; i < len(drivers); i++ {

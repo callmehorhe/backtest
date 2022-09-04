@@ -19,7 +19,6 @@ func (b *BotDrivers) HandleMessge(message *tgbotapi.Message, driver *models.Driv
 }
 
 func (b *BotDrivers) HandleText(message *tgbotapi.Message, driver *models.Driver) {
-	logrus.Warnf("%+v", driver)
 	switch driver.Handler {
 	case "SignUp":
 		b.Name(message, driver)

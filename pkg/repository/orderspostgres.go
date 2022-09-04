@@ -44,7 +44,7 @@ func (r *OrderPostgres) UpdateOrder(order models.Order) models.Order {
 		Status:     order.Status,
 		Address:    order.Address,
 		Cafe_Name:  order.Cafe_Name,
-		Driver:     order.Driver,
+		Driver_Id:  order.Driver_Id,
 	}
 	row := r.db.Table("orders").Where("order_id=?", id).Updates(&updatedOrder)
 	row.Take(&updatedOrder)

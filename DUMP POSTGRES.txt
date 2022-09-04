@@ -1,1 +1,1 @@
-pg_dump -U delivery -W -C -E UTF8 -d delivery -f delivery.sql
+pg_dump -U delivery -W -C -E LATIN1 -d delivery -f delivery.sql

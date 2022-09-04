@@ -10,10 +10,10 @@ import (
 )
 
 type OrderService struct {
-	repo repository.Orders
+	repo repository.Repository
 }
 
-func NewOrderService(repo repository.Orders) *OrderService {
+func NewOrderService(repo repository.Repository) *OrderService {
 	return &OrderService{
 		repo: repo,
 	}
@@ -28,6 +28,14 @@ func (s *OrderService) GetOrdersByUser(id, count int) []models.Order {
 			logrus.Error(err)
 		}
 		orders[i].Positions = pos
+		if orders[i].Driver_Id != 0 {
+			var err error
+			orders[i].Driver, err = s.repo.Drivers.GetDriverById(orders[i].Driver_Id)
+			if err != nil {
+				logrus.Error("cant add driver: %v", err)
+			}
+		}
+
 	}
 	return orders
 }

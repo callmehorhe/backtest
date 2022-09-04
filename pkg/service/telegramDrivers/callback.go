@@ -42,11 +42,19 @@ func (b *BotDrivers) CallbackHandler(callback tgbotapi.CallbackQuery) {
 
 func (b *BotDrivers) Accept(callback tgbotapi.CallbackQuery, order_ID int) {
 	order := b.repo.Orders.GetOrderByID(order_ID)
-	if order.Driver != 0 {
+	if order.Driver.Id != 0 {
 		b.SendMessage(callback.Message.Chat.ID, fmt.Sprintf("🛑Заказ №%d уже был подтвержден!", order_ID))
 		return
 	}
-	order.Driver = int64(callback.From.ID)
+	var err error
+	order.Driver, err = b.repo.Drivers.GetDriverById(int64(callback.From.ID))
+	if err != nil {
+		logrus.Error("cant find driver: %v", err)
+		b.SendMessage(-626247381, fmt.Sprintf("✔️Заказ №%d: ошибка подтверждения", order_ID))
+		return
+	}
+	order.Driver_Id = order.Driver.Id
+	logrus.Warn("add driver to order: %+v", order)
 	b.repo.Orders.UpdateOrder(order)
 	b.SendMessage(-626247381, fmt.Sprintf("✔️Заказ №%d подтвержден водителем %s %s!", order_ID, callback.From.FirstName, callback.From.LastName))
 	b.SendFullOrder(order, callback.From.ID)

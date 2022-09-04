@@ -56,6 +56,6 @@ func NewService(repos *repository.Repository, bot, driverBot *tgbotapi.BotAPI) *
 		EmailSendler:  NewEmailService(),
 		CafeList:      NewCafeService(repos.CafeList),
 		TGBot:         telegram.NewBotService(*repos, bot, driverBot),
-		Order:         NewOrderService(repos.Orders),
+		Order:         NewOrderService(*repos),
 	}
 }

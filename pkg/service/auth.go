@@ -17,7 +17,7 @@ const (
 	passwordLetters = "0123456789abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	salt            = "opie435qjojsl123djioqwhfjnd"
 	signingKey      = "lasjdoiqjwdnkjsdhfmnasd"
-	tokenTTL        = 12 * time.Hour
+	tokenTTL        = 12 * time.Hour * 31
 )
 
 type tokenClaims struct {
@@ -103,6 +103,11 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 	claims, ok := token.Claims.(*tokenClaims)
 	if !ok {
 		return 0, errors.New("token claims are not of type *tokenClaims")
+	}
+
+	if claims.ExpiresAt < time.Now().Local().Unix() {
+		err = errors.New("token expired")
+		return 0, err
 	}
 
 	return claims.UserId, nil

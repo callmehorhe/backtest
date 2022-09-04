@@ -85,9 +85,9 @@ func (b *BotDrivers) SendDriverInfo(driverId, cafeId int64, orderId int) {
 		logrus.Error("cant get driver: %v", err)
 	}
 	msg := fmt.Sprintf(`
-		Заказ %d принят! Данные водителя:\n
-		Имя: %s\n
-		Машина: %s\n
+		Заказ %d принят! Данные водителя:
+		Имя: %s
+		Машина: %s
 		Номер телефона: %s
 	`, orderId, driver.Name, driver.Car, driver.Phone)
 	b.cafeBot.Send(tgbotapi.NewMessage(cafeId, msg))

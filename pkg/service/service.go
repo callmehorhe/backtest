@@ -33,7 +33,6 @@ type CafeList interface {
 
 type TGBot interface {
 	Start() error
-	HandleMessge(message *tgbotapi.Message)
 	SendOrder(order models.Order) (models.Order, error)
 }
 

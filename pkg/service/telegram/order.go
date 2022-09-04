@@ -2,8 +2,6 @@ package telegram
 
 import (
 	"fmt"
-	"strconv"
-	"strings"
 
 	"github.com/callmehorhe/backtest/pkg/models"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
@@ -53,7 +51,7 @@ func (b *Bot) SendOrder(order models.Order) (models.Order, error) {
 	)
 	msg := tgbotapi.NewMessage(cafe.Chat_ID, text)
 	msg.ReplyMarkup = nKeyboard
-	_, err := b.bot.Send(msg)
+	_, err := b.cafeBot.bot.Send(msg)
 	if err != nil {
 		logrus.Errorf("cant send message to tgDeliveryBot, %v", err)
 		return models.Order{}, err
@@ -63,60 +61,22 @@ func (b *Bot) SendOrder(order models.Order) (models.Order, error) {
 	return b.repo.UpdateOrder(order), nil
 }
 
-func (b *Bot) CallbackHandler(callback tgbotapi.CallbackQuery) {
-	tmp := strings.Split(callback.Data, "f")
-	id, _ := strconv.Atoi(tmp[1])
-	switch tmp[0] {
-	case "accept":
-		b.Accept(callback.Message.Chat.ID, id)
-	case "send":
-		b.Send(callback.Message.Chat.ID, id)
-	case "cancel":
-		b.Cancel(callback.Message.Chat.ID, id)
+func (b *Bot) NewOrderForDrivers(order models.Order) {
+	//Сообщение телеграмм бота
+	text := fmt.Sprintf("Заказ №%d\n%s\n", order.Order_ID, order.Cafe_Name)
+	text += fmt.Sprintf("Адрес: %s\n", order.Address)
+	text += fmt.Sprintf("Сумма: %dр.", order.Cost)
+	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("acceptf%d", order.Order_ID)),
+		),
+	)
+	msg := tgbotapi.NewMessage(-626247381, text)
+	msg.ReplyMarkup = nKeyboard
+	_, err := b.driverBot.bot.Send(msg)
+	if err != nil {
+		logrus.Errorf("message cant be sent: %v", err)
+		return
 	}
 }
 
-func (b *Bot) Accept(chat_ID int64, id int) {
-	order := b.repo.Orders.GetOrderByID(id)
-	if order.Status == "acceptet" {
-		b.SendMessage(chat_ID, fmt.Sprintf("🛑Заказ №%d был подтвержден ранее!", id))
-		return
-	} else if order.Status == "canceled" {
-		b.SendMessage(chat_ID, fmt.Sprintf("🛑Заказ №%d был отменен!", id))
-		return
-	}
-	order.Status = "accepted"
-	b.repo.Orders.UpdateOrder(order)
-	b.SendMessage(chat_ID, fmt.Sprintf("✔️Заказ №%d подтвержден!", id))
-	if order.Address != "Навынос" {
-		b.driverBot.NewOrder(order)
-	}
-}
-
-func (b *Bot) Send(chat_ID int64, id int) {
-	order := b.repo.Orders.GetOrderByID(id)
-	if order.Status != "accepted" {
-		b.SendMessage(chat_ID, fmt.Sprintf("🛑Для начала подтвердите заказ №%d!", id))
-		return
-	} else if order.Status == "canceled" {
-		b.SendMessage(chat_ID, fmt.Sprintf("🛑Заказ №%d был отменен!", id))
-		return
-	}
-	order.Status = "sent"
-	b.repo.Orders.UpdateOrder(order)
-	b.SendMessage(chat_ID, fmt.Sprintf("✅Заказ №%d отправлен!", id))
-}
-
-func (b *Bot) Cancel(chat_ID int64, id int) {
-	order := b.repo.Orders.GetOrderByID(id)
-	if order.Status == "accepted" || order.Status == "sent" {
-		b.SendMessage(chat_ID, fmt.Sprintf("🛑Заказ №%d уже был подтвержден! Нельзя отменить подтвержденный заказ!", id))
-		return
-	} else if order.Status == "canceled" {
-		b.SendMessage(chat_ID, fmt.Sprintf("🛑Заказ №%d был отменен ранее!", id))
-		return
-	}
-	order.Status = "canceled"
-	b.repo.Orders.UpdateOrder(order)
-	b.SendMessage(chat_ID, fmt.Sprintf("❌Заказ №%d отменен!", id))
-}

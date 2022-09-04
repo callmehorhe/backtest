@@ -1,51 +1,49 @@
 package telegram
 
 import (
+	"github.com/callmehorhe/backtest/pkg/models"
 	"github.com/callmehorhe/backtest/pkg/repository"
-	telegramdrivers "github.com/callmehorhe/backtest/pkg/service/telegramDrivers"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
-	"github.com/sirupsen/logrus"
 )
 
-type Bot struct {
-	bot       *tgbotapi.BotAPI
-	repo      repository.Repository
-	driverBot telegramdrivers.BotDrivers
+var drivers []models.Driver
+
+type CafeBot struct {
+	bot *tgbotapi.BotAPI
 }
 
-func NewBotService(repo repository.Repository, bot, driverBot *tgbotapi.BotAPI) *Bot {
-	botDriver := telegramdrivers.NewBotService(repo, driverBot, bot)
+type DriverBot struct {
+	bot *tgbotapi.BotAPI
+}
+
+type Bot struct {
+	cafeBot   CafeBot
+	driverBot DriverBot
+	repo      *repository.Repository
+}
+
+func NewBotService(repo repository.Repository, cafeBot, driverBot *tgbotapi.BotAPI) *Bot {
+	cafe := CafeBot{
+		bot: cafeBot,
+	}
+	driver := DriverBot{
+		bot: driverBot,
+	}
 	return &Bot{
-		bot:       bot,
-		driverBot: *botDriver,
-		repo:      repo,
+		cafeBot:   cafe,
+		driverBot: driver,
+		repo:      &repo,
 	}
 }
 
 func (b *Bot) Start() error {
-	logrus.Printf("Bot %s activated", b.bot.Self.UserName)
-
-	updates, err := b.initUpdateChannel()
-	if err != nil {
-		return err
-	}
-	go b.handleUpdates(updates)
-	b.driverBot.Start()
+	go b.StartCafe()
+	go b.StartDrivers()
 	return nil
 }
 
-func (b *Bot) initUpdateChannel() (tgbotapi.UpdatesChannel, error) {
+func (b *Bot) initUpdateChannel(bot *tgbotapi.BotAPI) (tgbotapi.UpdatesChannel, error) {
 	u := tgbotapi.NewUpdate(0)
 	u.Timeout = 60
-	return b.bot.GetUpdatesChan(u)
-}
-
-func (b *Bot) handleUpdates(updates tgbotapi.UpdatesChannel) {
-	for update := range updates {
-		if update.Message != nil { // ignore any non-Message Updates
-			b.HandleMessge(update.Message)
-		} else if update.CallbackQuery != nil {
-			b.CallbackHandler(*update.CallbackQuery)
-		}
-	}
+	return bot.GetUpdatesChan(u)
 }

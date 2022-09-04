@@ -74,3 +74,9 @@ func (r *CafePostgres) UpdatePos(menu models.Menu) {
 func (r *CafePostgres) DeletePos(id []int) {
 	r.db.Table("menu").Delete(&models.Menu{}, id)
 }
+
+func (r *CafePostgres) GetCafeChatId(id int) int64 {
+	var chat_id int64
+	r.db.Table("cafes").Where("id_cafe = ?", id).Select("chat_id").Take(&chat_id)
+	return chat_id
+}

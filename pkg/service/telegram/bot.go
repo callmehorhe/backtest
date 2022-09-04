@@ -14,7 +14,7 @@ type Bot struct {
 }
 
 func NewBotService(repo repository.Repository, bot, driverBot *tgbotapi.BotAPI) *Bot {
-	botDriver := telegramdrivers.NewBotService(repo, driverBot)
+	botDriver := telegramdrivers.NewBotService(repo, driverBot, bot)
 	return &Bot{
 		bot:       bot,
 		driverBot: *botDriver,

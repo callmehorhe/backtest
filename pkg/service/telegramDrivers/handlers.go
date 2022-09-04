@@ -1,66 +1,80 @@
 package telegramdrivers
 
 import (
-	"log"
-	"strconv"
+	"fmt"
 
+	"github.com/callmehorhe/backtest/pkg/models"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api"
+	"github.com/sirupsen/logrus"
 )
 
-var (
-	handler = ""
-)
-
-func (b *BotDrivers) HandleMessge(message *tgbotapi.Message) {
+func (b *BotDrivers) HandleMessge(message *tgbotapi.Message, driver *models.Driver) {
 	if message.IsCommand() {
-		b.HandleCommand(message)
+		b.HandleCommand(message, driver)
 		return
 	}
 	if message.Text != "" {
-		b.HandleText(message)
+		b.HandleText(message, driver)
 	}
 }
 
-func (b *BotDrivers) HandleText(message *tgbotapi.Message) {
-	switch handler {
+func (b *BotDrivers) HandleText(message *tgbotapi.Message, driver *models.Driver) {
+	logrus.Warnf("%+v", driver)
+	switch driver.Handler {
 	case "SignUp":
-		b.SignUp(message)
+		b.Name(message, driver)
+	case "CarModel":
+		b.CarModer(message, driver)
+	case "CarNumber":
+		b.CarNumber(message, driver)
+	case "Phone":
+		b.Phone(message, driver)
 	}
 }
 
-func (b *BotDrivers) HandleCommand(message *tgbotapi.Message) {
+func (b *BotDrivers) HandleCommand(message *tgbotapi.Message, driver *models.Driver) {
 	switch message.Command() {
 	case "start":
-		b.bot.Send(tgbotapi.NewMessage(message.Chat.ID, "Введите ID:"))
-		handler = "SignUp"
+		if b.repo.Drivers.IsNew(message.Chat.ID) {
+			b.bot.Send(tgbotapi.NewMessage(message.Chat.ID, "Введите ФИО:"))
+			driver.Handler = "SignUp"
+			return
+		}
+		b.SendMessage(message.Chat.ID, "Вы уже зарегистрированы!")
 	case "cancel":
-		handler = ""
+		driver.Handler = ""
 	case "info":
 	}
 }
 
-func (b *BotDrivers) SignUp(message *tgbotapi.Message) {
-	cafeId, err := strconv.Atoi(message.Text)
+func (b *BotDrivers) Name(message *tgbotapi.Message, driver *models.Driver) {
+	driver.Name = message.Text
+	b.SendMessage(message.Chat.ID, "Введите марку и цвет машины: ")
+	driver.Handler = "CarModel"
+}
+
+func (b *BotDrivers) CarModer(message *tgbotapi.Message, driver *models.Driver) {
+	driver.Car = message.Text
+	b.SendMessage(message.Chat.ID, "Введите номер машины: ")
+	driver.Handler = "CarNumber"
+}
+
+func (b *BotDrivers) CarNumber(message *tgbotapi.Message, driver *models.Driver) {
+	driver.Car += " " + message.Text
+	b.SendMessage(message.Chat.ID, "Введите номер телефона в формате +7хххххххххх: ")
+	driver.Handler = "Phone"
+}
+
+func (b *BotDrivers) Phone(message *tgbotapi.Message, driver *models.Driver) {
+	driver.Phone = message.Text
+	msg := fmt.Sprintf("Вы прошли регистрацию! Ваши данные:\nИмя: %s\nМашина: %s\nНомер телефона: %s", driver.Name, driver.Car, driver.Phone)
+	b.SendMessage(message.Chat.ID, msg)
+	err := b.repo.Drivers.CreateDriver(*driver)
 	if err != nil {
-		b.SendMessage(message.Chat.ID, "ID введен некорректно")
-		return
+		b.SendMessage(message.Chat.ID, "Не удалось добавить водителя!")
+		logrus.Error("cant add driver: %v", err)
 	}
-	cafe := b.repo.GetCafeByID(cafeId)
-	log.Print(cafe)
-	if cafe.Id_Cafe == 0 {
-		b.SendMessage(message.Chat.ID, "Введен несуществующий ID")
-		return
-	}
-
-	if cafe.Chat_ID != 0 {
-		b.SendMessage(message.Chat.ID, "ID уже занят.")
-		b.SendMessage(cafe.Chat_ID, "Попытка повторной привязки вашего ID к другому устройству!")
-		return
-	}
-
-	b.repo.AddChatId(cafe.Id_Cafe, message.Chat.ID)
-	b.SendMessage(message.Chat.ID, "Регистрация прошла успешно!")
-	handler = ""
+	driver.Handler = ""
 }
 
 func (b *BotDrivers) SendMessage(chatID int64, text string) {

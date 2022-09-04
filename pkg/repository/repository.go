@@ -23,6 +23,7 @@ type CafeList interface {
 	CreatePos(menu models.Menu)
 	UpdatePos(menu models.Menu)
 	DeletePos(id []int)
+	GetCafeChatId(id int) int64
 }
 
 type Orders interface {
@@ -34,10 +35,17 @@ type Orders interface {
 	GetOrdersCount(id int) int
 }
 
+type Drivers interface {
+	IsNew(id int64) bool
+	CreateDriver(driver models.Driver) error
+	GetDriverById(id int64) (models.Driver, error)
+}
+
 type Repository struct {
 	Authorization
 	CafeList
 	Orders
+	Drivers
 }
 
 func NewRepository(db *gorm.DB) *Repository {
@@ -45,5 +53,6 @@ func NewRepository(db *gorm.DB) *Repository {
 		Authorization: NewAuthPostgres(db),
 		CafeList:      NewCafePostgres(db),
 		Orders:        NewOrderPostgres(db),
+		Drivers:       NewDriverPostgres(db),
 	}
 }

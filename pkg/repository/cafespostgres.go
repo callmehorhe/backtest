@@ -24,7 +24,7 @@ func (r *CafePostgres) GetCafe(id int, password string) (models.Cafe, error) {
 
 func (r *CafePostgres) GetCafeList() []models.Cafe {
 	var cafes []models.Cafe
-	r.db.Table("cafes").Order(clause.OrderByColumn{Column: clause.Column{Name: "id_cafe"}, Desc: false}).Find(&cafes)
+	r.db.Table("cafes").Order(clause.OrderByColumn{Column: clause.Column{Name: "queue"}, Desc: false}).Find(&cafes)
 	return cafes
 }
 

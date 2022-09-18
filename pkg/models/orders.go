@@ -13,7 +13,16 @@ type Order struct {
 	Positions  []Position     `json:"cart"          gorm:"-"`
 	Address    string         `json:"address"       gorm:"type:varchar(255)"`
 	Phone      string         `json:"phone"         gorm:"type:varchar(255)"`
-	Status     string         `json:"status"        gorm:"type:varchar(255)"`
+	Status     Status         `json:"status"        gorm:"type:varchar(255)"`
 	Driver     Driver         `json:"driver"        gorm:"-"`
 	Driver_Id  int64          `json:"-"             gorm:"type:bigint"`
 }
+
+type Status string
+
+const (
+	Accepted  Status = "accepted"
+	Sent      Status = "sent"
+	Canceled  Status = "canceled"
+	Delivered Status = "delivered"
+)

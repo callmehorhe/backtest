@@ -1,4 +1,2 @@
 .env
-release/
-test
-main
+build/

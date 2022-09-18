@@ -40,13 +40,13 @@ func (b *Bot) SendOrder(order models.Order) (models.Order, error) {
 	text += fmt.Sprintf("💸Итого: %dр.", order.Cost)
 	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("acceptf%d", id)),
+			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("%sf%d",models.Accepted, id)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Отправить заказ", fmt.Sprintf("sendf%d", id)),
+			tgbotapi.NewInlineKeyboardButtonData("Отправить заказ", fmt.Sprintf("%sf%d",models.Sent, id)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Отменить заказ", fmt.Sprintf("cancelf%d", id)),
+			tgbotapi.NewInlineKeyboardButtonData("Отменить заказ", fmt.Sprintf("%sf%d",models.Canceled, id)),
 		),
 	)
 	msg := tgbotapi.NewMessage(cafe.Chat_ID, text)

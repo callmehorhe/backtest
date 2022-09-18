@@ -19,7 +19,7 @@ func (b *Bot) NewOrder(order models.Order) {
 	text += fmt.Sprintf("Сумма: %dр.", order.Cost)
 	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("acceptf%d", order.Order_ID)),
+			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("%sf%d", models.Accepted, order.Order_ID)),
 		),
 	)
 	msg := tgbotapi.NewMessage(-626247381, text)
@@ -54,6 +54,10 @@ func (b *Bot) CallbackHandler(callback tgbotapi.CallbackQuery) {
 		b.driverBot.SendFullOrder(order, callback.From.ID)
 		cafechat := b.repo.CafeList.GetCafeChatId(order.Cafe_Id)
 		b.cafeBot.SendDriverInfo(driver, cafechat, order.Order_ID)
+	case "delivered":
+		order.Status = models.Delivered
+		b.repo.Orders.UpdateOrder(order)
+		b.driverBot.SendMessage(int64(callback.From.ID), "Заказ доставлен!")
 	}
 }
 
@@ -82,7 +86,13 @@ func (b *DriverBot) SendFullOrder(order models.Order, driver_ID int) error {
 	text += "Доставка: 100р\n"
 	text += "Сервисный сбор: 20р\n"
 	text += fmt.Sprintf("💸Итого: %dр.", order.Cost)
+	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(
+		tgbotapi.NewInlineKeyboardRow(
+			tgbotapi.NewInlineKeyboardButtonData("Заказ доставлен", fmt.Sprintf("%sf%d", models.Delivered, order.Order_ID)),
+		),
+	)
 	msg := tgbotapi.NewMessage(int64(driver_ID), text)
+	msg.ReplyMarkup = nKeyboard
 	_, err = b.bot.Send(msg)
 	if err != nil {
 		logrus.Errorf("cant send message to tgDeliveryBot, %v", err)

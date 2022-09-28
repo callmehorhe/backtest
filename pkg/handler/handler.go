@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"io"
+	"os"
+
 	"github.com/callmehorhe/backtest/pkg/service"
 	"github.com/gin-gonic/gin"
+	"github.com/sirupsen/logrus"
 )
 
 type Handler struct {
@@ -16,7 +20,20 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
+	if err := os.MkdirAll("./logs/gin", 0777); err != nil {
+		logrus.Fatalf("Can't create log path: %v", err)
+	}
+	logFile, err := os.OpenFile("./logs/gin/logs.txt", os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+		logrus.Fatalf("cant create log file: %v", err)
+	}
+	defer logFile.Close()
+	gin.DefaultWriter = io.MultiWriter(logFile, os.Stdout)
+	gin.DefaultErrorWriter = io.MultiWriter(logFile, os.Stderr)
+
 	gin.SetMode(gin.ReleaseMode)
+	rot := gin.New()
+	rot.Use()
 	router := gin.Default()
 	router.Use(CORSMiddleware)
 	router.Static("/images", "./images")
@@ -34,7 +51,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		api := slash.Group("/api", h.Auth)
 		{
 			cafes := api.Group("/cafes")
-			{
+			{	
 				cafes.GET("/", h.getCafeList)
 				cafes.GET("/:id", h.getMenuByCafeID)
 				cafes.POST("/admin", h.changeMenu)

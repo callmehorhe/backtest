@@ -9,6 +9,7 @@ type Cafe struct {
 	Address   string `json:"address" gorm:"type:varchar(255)"`
 	Chat_ID   int64  `json:"-"       gorm:"type:bigint"`
 	Password  string `json:"-"       gorm:"type:varchar(255)"`
+	Enable    bool   `json:"enable"  gorm:"type:bool"`
 }
 
 type Menu struct {

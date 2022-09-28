@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/callmehorhe/backtest/pkg/models"
+	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
@@ -14,6 +15,7 @@ func (s *CafeService) UpdateCafe(cafe models.Cafe) error {
 		SaveImage(cafe.BaseImage, path)
 		cafe.Image = "http://92.63.104.228" + viper.GetString("port") + "/images/" + path
 	}
+	logrus.Warnf("cafe: %+v", cafe)
 	return s.repo.UpdateCafe(cafe)
 }
 

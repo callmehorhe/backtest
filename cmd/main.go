@@ -14,18 +14,6 @@ import (
 )
 
 func main() {
-	if err := os.MkdirAll("./logs/logrus", 0777); err != nil {
-		logrus.Fatalf("Can't create log path: %v", err)
-		return
-	}
-	logFile, err := os.OpenFile("./logs/logrus/logs.txt", os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		logrus.Fatalf("cant create log file: %v", err)
-	}
-	defer logFile.Close()
-	logrus.SetReportCaller(true)
-	logrus.SetOutput(logFile)
-
 	if err := initConfig(); err != nil {
 		logrus.Fatal(err)
 	}

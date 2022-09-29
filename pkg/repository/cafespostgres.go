@@ -2,8 +2,8 @@ package repository
 
 import (
 	"github.com/callmehorhe/backtest/pkg/models"
+	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 type CafePostgres struct {
@@ -24,7 +24,8 @@ func (r *CafePostgres) GetCafe(id int, password string) (models.Cafe, error) {
 
 func (r *CafePostgres) GetCafeList() []models.Cafe {
 	var cafes []models.Cafe
-	r.db.Table("cafes").Order(clause.OrderByColumn{Column: clause.Column{Name: "queue"}, Desc: false}).Order(clause.OrderByColumn{Column: clause.Column{Name: "enable"}, Desc: false}).Find(&cafes)
+	r.db.Table("cafes").Order("enable desc, queue").Find(&cafes)
+	logrus.Infof("cafes: %+v", cafes)
 	return cafes
 }
 

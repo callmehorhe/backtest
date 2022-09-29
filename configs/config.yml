@@ -6,7 +6,7 @@ db:
   host: "localhost"
   port: "5432"
   dbname: "delivery"
-  password: "itcenter2022"
+  password: "salamjl"
   sslmode: "disable"
 
 email:

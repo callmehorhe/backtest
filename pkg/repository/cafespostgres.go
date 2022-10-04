@@ -2,7 +2,6 @@ package repository
 
 import (
 	"github.com/callmehorhe/backtest/pkg/models"
-	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
@@ -25,7 +24,6 @@ func (r *CafePostgres) GetCafe(id int, password string) (models.Cafe, error) {
 func (r *CafePostgres) GetCafeList() []models.Cafe {
 	var cafes []models.Cafe
 	r.db.Table("cafes").Order("enable desc, queue").Find(&cafes)
-	logrus.Infof("cafes: %+v", cafes)
 	return cafes
 }
 
@@ -56,6 +54,7 @@ func (r *CafePostgres) UpdateCafe(cafe models.Cafe) error {
 }
 
 func (r *CafePostgres) CreatePos(menu models.Menu) {
+	//t := true
 	m := models.Menu{
 		Id_Cafe:     menu.Id_Cafe,
 		Name:        menu.Name,
@@ -70,6 +69,8 @@ func (r *CafePostgres) CreatePos(menu models.Menu) {
 }
 
 func (r *CafePostgres) UpdatePos(menu models.Menu) {
+	/* t := true
+	menu.Avaible = &t */
 	r.db.Table("menu").Where("id_menu=?", menu.Id_Menu).Updates(&menu)
 }
 

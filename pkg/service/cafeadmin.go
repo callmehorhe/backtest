@@ -5,17 +5,15 @@ import (
 	"strings"
 
 	"github.com/callmehorhe/backtest/pkg/models"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
 func (s *CafeService) UpdateCafe(cafe models.Cafe) error {
 	if cafe.BaseImage != "" {
-		path := strings.ReplaceAll(fmt.Sprintf("%s/%s.jpg", cafe.Name, cafe.Name), " ", "")
+		path := strings.ReplaceAll(fmt.Sprintf("%s/%sName.jpg", cafe.Name, cafe.Name), " ", "")
 		SaveImage(cafe.BaseImage, path)
 		cafe.Image = "http://92.63.104.228" + viper.GetString("port") + "/images/" + path
 	}
-	logrus.Warnf("cafe: %+v", cafe)
 	return s.repo.UpdateCafe(cafe)
 }
 

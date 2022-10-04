@@ -9,7 +9,7 @@ type Cafe struct {
 	Address   string `json:"address" gorm:"type:varchar(255)"`
 	Chat_ID   int64  `json:"-"       gorm:"type:bigint"`
 	Password  string `json:"-"       gorm:"type:varchar(255)"`
-	Enable    bool   `json:"enable"  gorm:"type:bool"`
+	Enable    *bool  `json:"enable"  gorm:"type:bool"`
 }
 
 type Menu struct {
@@ -22,7 +22,7 @@ type Menu struct {
 	Category    string `json:"category"    gorm:"type:varchar(255)"`
 	Description string `json:"desc"        gorm:"type:varchar(255)"`
 	Weight      int    `json:"weight"      gorm:"type:integer"`
-	Avaible     bool   `json:"avaible"     gorm:"type:boolean"`
+	Avaible     *bool  `json:"avaible"     gorm:"type:boolean"`
 }
 
 type Category struct {

@@ -50,3 +50,30 @@ func (r *AuthPostgres) ConfirmUser(code string) error {
 	}
 	return r.db.Table("users").Where("id_user=?", id).Update("confirm", "").Error
 }
+
+func (r *AuthPostgres) ForgetPassword(email, phone, auth string) error {
+	var user models.User
+	if err := r.db.Table("users").Where("email=? AND phone=?", email, phone).Scan(&user).Error; err != nil {
+		return err
+	}
+	user.Password = ""
+	user.Confirm = auth
+	if err := r.db.Table("users").Where("email=?", email).Updates(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
+func (r *AuthPostgres) ResetPassword(auth, pass string) error {
+	var user models.User
+	if err := r.db.Table("users").Where("confirm=?").Scan(&user).Error; err != nil {
+		return err
+	}
+	user.Confirm = ""
+	user.Password = pass
+
+	if err := r.db.Table("users").Where("id_user=?", user.Id_User).Updates(&user).Error; err != nil {
+		return err
+	}
+	return nil
+}

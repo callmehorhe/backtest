@@ -52,7 +52,7 @@ func (s *AuthService) CreateUser(user models.User) (int, error) {
 		return 0, err
 	}
 	text := fmt.Sprintf("Ссылка для подтверждения:\nhttp://dhouse-it.ru/confirm/%s", user.Confirm)
-	if err := NewEmailService().SendEmail(user.Email, "Password", text); err != nil {
+	if err := NewEmailService().SendEmail(user.Email, "Ссылка для подтверждения", text); err != nil {
 		return 0, err
 	}
 
@@ -122,4 +122,26 @@ func geneartePasswordHash(password string) string {
 
 func (s *AuthService) ConfirmUser(code string) error {
 	return s.repo.ConfirmUser(code)
+}
+
+func (s *AuthService) ForgetPassword(email, phone string) error {
+	auth := ""
+	for i := 0; i < 20; i++ {
+		auth += string(passwordLetters[rand.Intn(82)])
+	}
+	if err := s.repo.ForgetPassword(email, phone, auth); err != nil {
+		return err
+	}
+	text := fmt.Sprintf("Ссылка для подтверждения:\nhttp://dhouse-it.ru/resetPassword/%s", auth)
+	if err := NewEmailService().SendEmail(email, "Ссылка для восстановления пароля", text); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *AuthService) ResetPassword(auth, pass string) error {
+	if err := s.repo.ResetPassword(auth, pass); err != nil {
+		return err
+	}
+	return nil
 }

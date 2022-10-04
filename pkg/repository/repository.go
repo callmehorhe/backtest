@@ -10,6 +10,8 @@ type Authorization interface {
 	GetUser(username, password string) (models.User, error)
 	GetUserById(id int) (models.User, error)
 	ConfirmUser(code string) error
+	ForgetPassword(email, phone, auth string) error
+	ResetPassword(auth, pass string) error
 }
 
 type CafeList interface {

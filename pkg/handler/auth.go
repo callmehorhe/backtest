@@ -101,3 +101,38 @@ func (h *Handler) confirm(c *gin.Context) {
 	}
 	c.Status(http.StatusOK)
 }
+
+type dataForgetPass struct {
+	Email string `json:"email"`
+	Phone string `json:"phone"`
+}
+
+func (h *Handler) forgetPass(c *gin.Context) {
+	var input dataForgetPass
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "invalid input")
+		return
+	}
+	if err := h.services.Authorization.ForgetPassword(input.Email, input.Phone); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+	c.Status(http.StatusOK)
+}
+
+func (h *Handler) resetPassword(c *gin.Context) {
+	type dataResetPass struct {
+		Auth        string `json:"auth"`
+		NewPassword string `json:"password"`
+	}
+	var input dataResetPass
+	if err := c.BindJSON(&input); err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, "invalid input")
+		return
+	}
+	if err := h.services.Authorization.ResetPassword(input.Auth, input.NewPassword); err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
+	c.Status(http.StatusOK)
+}

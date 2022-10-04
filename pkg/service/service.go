@@ -14,6 +14,8 @@ type Authorization interface {
 	GetUser(email, password string) (models.User, error)
 	GetUserByID(id int) (models.User, error)
 	ConfirmUser(code string) error
+	ForgetPassword(email, phone string) error
+	ResetPassword(auth, pass string) error
 }
 
 type EmailSendler interface {

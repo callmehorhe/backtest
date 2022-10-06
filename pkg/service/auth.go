@@ -132,7 +132,7 @@ func (s *AuthService) ForgetPassword(email, phone string) error {
 	if err := s.repo.ForgetPassword(email, phone, auth); err != nil {
 		return err
 	}
-	text := fmt.Sprintf("Ссылка для подтверждения:\nhttp://dhouse-it.ru/resetPassword/%s", auth)
+	text := fmt.Sprintf("Ссылка для подтверждения:\nhttp://dhouse-it.ru/reset-password/%s", auth)
 	if err := NewEmailService().SendEmail(email, "Ссылка для восстановления пароля", text); err != nil {
 		return err
 	}
@@ -140,7 +140,7 @@ func (s *AuthService) ForgetPassword(email, phone string) error {
 }
 
 func (s *AuthService) ResetPassword(auth, pass string) error {
-	if err := s.repo.ResetPassword(auth, pass); err != nil {
+	if err := s.repo.ResetPassword(auth, geneartePasswordHash(pass)); err != nil {
 		return err
 	}
 	return nil

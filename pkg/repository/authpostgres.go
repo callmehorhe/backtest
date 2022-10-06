@@ -2,6 +2,7 @@ package repository
 
 import (
 	"errors"
+	"log"
 
 	"github.com/callmehorhe/backtest/pkg/models"
 	"gorm.io/gorm"
@@ -66,13 +67,14 @@ func (r *AuthPostgres) ForgetPassword(email, phone, auth string) error {
 
 func (r *AuthPostgres) ResetPassword(auth, pass string) error {
 	var user models.User
-	if err := r.db.Table("users").Where("confirm=?").Scan(&user).Error; err != nil {
+	if err := r.db.Table("users").Where("confirm=?", auth).Take(&user).Error; err != nil {
 		return err
 	}
+	log.Print(user, auth, pass)
 	user.Confirm = ""
 	user.Password = pass
 
-	if err := r.db.Table("users").Where("id_user=?", user.Id_User).Updates(&user).Error; err != nil {
+	if err := r.db.Table("users").Where("id_user=?", user.Id_User).Updates(&user).Update("confirm", "").Error; err != nil {
 		return err
 	}
 	return nil

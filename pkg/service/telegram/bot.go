@@ -7,6 +7,7 @@ import (
 )
 
 var drivers []models.Driver
+var cashers []models.Cashers
 
 type CafeBot struct {
 	bot *tgbotapi.BotAPI

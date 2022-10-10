@@ -9,10 +9,6 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var (
-	handler = ""
-)
-
 type Cafe struct {
 	ID     int
 	ChadID int64
@@ -36,42 +32,60 @@ func (b *Bot) StartCafe() error {
 func (b *Bot) handleUpdatesCafe(updates tgbotapi.UpdatesChannel) {
 	for update := range updates {
 		if update.Message != nil { // ignore any non-Message Updates
-			b.HandleMessgeFromCafe(update.Message)
+			isNew := true
+			for i := 0; i < len(cashers); i++ {
+				if cashers[i].Id == update.Message.Chat.ID {
+					b.HandleMessgeFromCafe(update.Message, &cashers[i])
+					isNew = false
+					break
+				}
+			}
+			if isNew {
+				casher := models.Cashers{
+					Id: update.Message.Chat.ID,
+				}
+				b.HandleMessgeFromCafe(update.Message, &casher)
+				cashers = append(cashers, casher)
+			}
 		} else if update.CallbackQuery != nil {
 			b.CallbackHandlerForCafe(*update.CallbackQuery)
 		}
 	}
 }
 
-func (b *Bot) HandleMessgeFromCafe(message *tgbotapi.Message) {
+func (b *Bot) HandleMessgeFromCafe(message *tgbotapi.Message, casher *models.Cashers) {
 	if message.IsCommand() {
-		b.HandleCommandCafe(message)
+		b.HandleCommandCafe(message, casher)
 		return
 	}
 	if message.Text != "" {
-		b.HandleTextCafe(message)
+		b.HandleTextCafe(message, casher)
 	}
 }
 
-func (b *Bot) HandleCommandCafe(message *tgbotapi.Message) {
+func (b *Bot) HandleCommandCafe(message *tgbotapi.Message, casher *models.Cashers) {
 	switch message.Command() {
 	case "start":
 		b.cafeBot.bot.Send(tgbotapi.NewMessage(message.Chat.ID, "Введите ID:"))
-		handler = "SignUp"
+		casher.Handler = "SignUpID"
+	case "pass":
+		b.cafeBot.bot.Send(tgbotapi.NewMessage(message.Chat.ID, "Введите ID:"))
 	case "cancel":
-		handler = ""
+		casher.Handler = ""
 	case "info":
 	}
 }
 
-func (b *Bot) HandleTextCafe(message *tgbotapi.Message) {
-	switch handler {
-	case "SignUp":
-		b.SignUpInCafeBot(message)
+func (b *Bot) HandleTextCafe(message *tgbotapi.Message, casher *models.Cashers) {
+	switch casher.Handler {
+	case "SignUpID":
+		b.SignUpInCafeBot(message, casher)
+	case "SignUpPass":
+		b.SignUpPassBot(message, casher)
 	}
 }
 
-func (b *Bot) SignUpInCafeBot(message *tgbotapi.Message) {
+func (b *Bot) SignUpInCafeBot(message *tgbotapi.Message, casher *models.Cashers) {
 	cafeId, err := strconv.Atoi(message.Text)
 	if err != nil {
 		b.cafeBot.SendMessage(message.Chat.ID, "ID введен некорректно")
@@ -83,15 +97,31 @@ func (b *Bot) SignUpInCafeBot(message *tgbotapi.Message) {
 		return
 	}
 
-	if cafe.Chat_ID != 0 {
-		b.cafeBot.SendMessage(message.Chat.ID, "ID уже занят.")
-		b.cafeBot.SendMessage(cafe.Chat_ID, "Попытка повторной привязки вашего ID к другому устройству!")
+	//b.repo.AddChatId(cafe.Id_Cafe, message.Chat.ID)
+	//b.cafeBot.SendMessage(message.Chat.ID, "Регистрация прошла успешно!")
+	b.cafeBot.bot.Send(tgbotapi.NewMessage(message.Chat.ID, "Введите пароль:"))
+	casher.Handler = "SignUpPass"
+	casher.CafeID = cafeId
+}
+
+func (b *Bot) SignUpPassBot(message *tgbotapi.Message, casher *models.Cashers) {
+	pass := message.Text
+	casher.Handler = ""
+
+	cafe, err := b.repo.CafeList.GetCafe(casher.CafeID, pass)
+	if err != nil {
+		b.cafeBot.SendMessage(casher.Id, "Введен неверный пароль!")
 		return
 	}
 
-	b.repo.AddChatId(cafe.Id_Cafe, message.Chat.ID)
-	b.cafeBot.SendMessage(message.Chat.ID, "Регистрация прошла успешно!")
-	handler = ""
+	cafe.Chat_ID = append(cafe.Chat_ID, message.Chat.ID)
+	if err := b.repo.CafeList.UpdateCafe(cafe); err != nil {
+		logrus.Errorf("[SignUpCafe] cant update cafe db: %v", err)
+		b.cafeBot.SendMessage(casher.Id, "Невозможно привязать аккаунт! Обратитесь в поддержку!")
+		return
+	}
+
+	b.cafeBot.SendMessage(casher.Id, fmt.Sprintf("Регистрация прошла успешно! Теперь вы будете получать информацию о заказах из кафе %v.", cafe.Name))
 }
 
 func (b *CafeBot) SendDriverInfo(driver models.Driver, cafeId int64, orderId int) {

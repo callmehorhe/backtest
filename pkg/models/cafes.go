@@ -1,15 +1,26 @@
 package models
 
+import (
+	"github.com/lib/pq"
+)
+
 type Cafe struct {
-	Id_Cafe   int    `json:"id"      gorm:"primary_key;type:serial"`
-	Name      string `json:"name"    gorm:"type:varchar(255)"`
-	Phone     string `json:"phone"   gorm:"type:varchar(255)"`
-	Image     string `json:"img"     gorm:"type:varchar(255)"`
-	BaseImage string `json:"baseimg" gorm:"-"`
-	Address   string `json:"address" gorm:"type:varchar(255)"`
-	Chat_ID   int64  `json:"-"       gorm:"type:bigint"`
-	Password  string `json:"-"       gorm:"type:varchar(255)"`
-	Enable    *bool  `json:"enable"  gorm:"type:bool"`
+	Id_Cafe   int           `json:"id"      gorm:"primary_key;type:serial"`
+	Name      string        `json:"name"    gorm:"type:varchar(255)"`
+	Phone     string        `json:"phone"   gorm:"type:varchar(255)"`
+	Image     string        `json:"img"     gorm:"type:varchar(255)"`
+	BaseImage string        `json:"baseimg" gorm:"-"`
+	Address   string        `json:"address" gorm:"type:varchar(255)"`
+	Chat_ID   pq.Int64Array `json:"chat_id" gorm:"column:chat_id;type:bigint[]"`
+	Casher    Cashers       `json:"-"       gorm:"-"`
+	Password  string        `json:"-"       gorm:"type:varchar(255)"`
+	Enable    *bool         `json:"enable"  gorm:"type:bool"`
+}
+
+type Cashers struct {
+	Id      int64
+	CafeID  int
+	Handler string
 }
 
 type Menu struct {

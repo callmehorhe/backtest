@@ -40,23 +40,25 @@ func (b *Bot) SendOrder(order models.Order) (models.Order, error) {
 	text += fmt.Sprintf("💸Итого: %dр.", order.Cost)
 	nKeyboard := tgbotapi.NewInlineKeyboardMarkup(
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("%sf%d",models.Accepted, id)),
+			tgbotapi.NewInlineKeyboardButtonData("Принять заказ", fmt.Sprintf("%sf%d", models.Accepted, id)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Отправить заказ", fmt.Sprintf("%sf%d",models.Sent, id)),
+			tgbotapi.NewInlineKeyboardButtonData("Отправить заказ", fmt.Sprintf("%sf%d", models.Sent, id)),
 		),
 		tgbotapi.NewInlineKeyboardRow(
-			tgbotapi.NewInlineKeyboardButtonData("Отменить заказ", fmt.Sprintf("%sf%d",models.Canceled, id)),
+			tgbotapi.NewInlineKeyboardButtonData("Отменить заказ", fmt.Sprintf("%sf%d", models.Canceled, id)),
 		),
 	)
-	msg := tgbotapi.NewMessage(cafe.Chat_ID, text)
-	msg.ReplyMarkup = nKeyboard
-	_, err := b.cafeBot.bot.Send(msg)
-	if err != nil {
-		logrus.Errorf("cant send message to tgDeliveryBot, %v", err)
-		return models.Order{}, err
+	for _, casher := range cafe.Chat_ID {
+		msg := tgbotapi.NewMessage(casher, text)
+		msg.ReplyMarkup = nKeyboard
+		_, err := b.cafeBot.bot.Send(msg)
+		if err != nil {
+			logrus.Errorf("cant send message to tgDeliveryBot, %v", err)
+			return models.Order{}, err
+		}
+	
 	}
-
 	order.Order_ID = id
 	return b.repo.UpdateOrder(order), nil
 }
@@ -79,4 +81,3 @@ func (b *Bot) NewOrderForDrivers(order models.Order) {
 		return
 	}
 }
-

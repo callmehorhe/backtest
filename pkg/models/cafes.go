@@ -4,6 +4,10 @@ import (
 	"github.com/lib/pq"
 )
 
+const (
+	TakeawayOrder = "Навынос"
+)
+
 type Cafe struct {
 	Id_Cafe   int           `json:"id"      gorm:"primary_key;type:serial"`
 	Name      string        `json:"name"    gorm:"type:varchar(255)"`

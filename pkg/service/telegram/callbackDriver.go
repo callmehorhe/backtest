@@ -2,7 +2,6 @@ package telegram
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,7 +11,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (b *Bot) NewOrder(order models.Order) {
+func (b *Bot) NewOrderForDrivers(order models.Order) {
 	//Сообщение телеграмм бота
 	text := fmt.Sprintf("Заказ №%d\n%s\n", order.Order_ID, order.Cafe_Name)
 	text += fmt.Sprintf("Адрес: %s\n", order.Address)
@@ -33,45 +32,45 @@ func (b *Bot) NewOrder(order models.Order) {
 
 func (b *Bot) CallbackHandler(callback tgbotapi.CallbackQuery) {
 	tmp := strings.Split(callback.Data, "f")
-
 	id, _ := strconv.Atoi(tmp[1])
 	order := b.repo.Orders.GetOrderByID(id)
+
 	driver, err := b.repo.Drivers.GetDriverById(int64(callback.From.ID))
 	if err != nil {
 		logrus.Error("cant find driver: %v", err)
 		b.driverBot.SendMessage(-626247381, fmt.Sprintf("✔️Заказ №%d: ошибка подтверждения", order.Order_ID))
 		return
 	}
+	logrus.Info(tmp[0])
 	switch tmp[0] {
-	case "accept":
-		order, err = b.driverBot.Accept(callback, id, order, driver)
-		if err != nil {
-			logrus.Error(err)
-			return
-		}
-		b.repo.Orders.UpdateOrder(order)
-		b.driverBot.SendMessage(-626247381, fmt.Sprintf("✔️Заказ №%d подтвержден водителем %s %s!", order.Order_ID, callback.From.FirstName, callback.From.LastName))
-		b.driverBot.SendFullOrder(order, callback.From.ID)
+	case string(models.Accepted):
+		b.driverBot.Accept(callback, id, &order, driver)
 		cafechat := b.repo.CafeList.GetCafeChatId(order.Cafe_Id)
 		b.cafeBot.SendDriverInfo(driver, cafechat, order.Order_ID)
-	case "delivered":
+	case string(models.Delivered):
 		order.Status = models.Delivered
-		b.repo.Orders.UpdateOrder(order)
 		b.driverBot.SendMessage(int64(callback.From.ID), "Заказ доставлен!")
 	}
+	b.repo.Orders.UpdateOrder(order)
 }
 
-func (b *DriverBot) Accept(callback tgbotapi.CallbackQuery, order_ID int, order models.Order, driver models.Driver) (models.Order, error) {
+func (b *DriverBot) Accept(callback tgbotapi.CallbackQuery, order_ID int, order *models.Order, driver models.Driver) {
+	logrus.Info(order.Driver_Id)
 	if order.Driver_Id != 0 {
 		b.SendMessage(callback.Message.Chat.ID, fmt.Sprintf("🛑Заказ №%d уже был подтвержден!", order_ID))
-		return models.Order{}, errors.New("order was accepted by another driver")
+		return
 	}
 	order.Driver_Id = driver.Id
+	if order.Status != models.Sent {
+		order.Status = models.AcceptedByDriver
+	}
 	logrus.Warn("add driver to order: %+v", order)
-	return order, nil
+	b.SendMessage(-626247381, fmt.Sprintf("✔️Заказ №%d подтвержден водителем %s %s!", order.Order_ID, callback.From.FirstName, callback.From.LastName))
+	b.SendFullOrder(order, callback.From.ID)
+	return
 }
 
-func (b *DriverBot) SendFullOrder(order models.Order, driver_ID int) error {
+func (b *DriverBot) SendFullOrder(order *models.Order, driver_ID int) error {
 	text := fmt.Sprintf("Заказ №%d\n%s\n", order.Order_ID, order.Cafe_Name)
 	text += fmt.Sprintf("Адрес: %s\n", order.Address)
 	text += fmt.Sprintf("📱Номер телефона: %s\n", order.Phone)

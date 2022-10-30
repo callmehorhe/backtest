@@ -16,3 +16,8 @@ type Driver struct {
 	Phone   string `json:"phone" gorm:"type:varchar(255);not null"`
 	Handler string `json:"-"     gorm:"-"`
 }
+
+const (
+	DeliveryPrice = 100
+	ServicePrice  = 20
+)

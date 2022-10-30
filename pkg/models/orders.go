@@ -21,8 +21,11 @@ type Order struct {
 type Status string
 
 const (
-	Accepted  Status = "accepted"
-	Sent      Status = "sent"
-	Canceled  Status = "canceled"
-	Delivered Status = "delivered"
+	New              Status = "NEW"
+	Accepted         Status = "ACCEPTED"
+	Sent             Status = "SENT"
+	Ready            Status = "READY"
+	Canceled         Status = "CANCELED"
+	Delivered        Status = "DELIVERED"
+	AcceptedByDriver Status = "ACCEPTED_BY_DRIVER"
 )

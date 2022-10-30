@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/callmehorhe/backtest/pkg/models"
+	"github.com/sirupsen/logrus"
 	"gorm.io/datatypes"
 	"gorm.io/gorm"
 )
@@ -25,7 +26,7 @@ func (r *OrderPostgres) CreateOrder(order models.Order) int {
 	j, _ := json.Marshal(order.Positions)
 	order.Order_list = datatypes.JSON(j)
 	order.Order_date = time.Now().Format("2006-01-02 15:04:05")
-
+	logrus.Info(order.Status)
 	row := r.db.Table("orders").Create(&order)
 	if err := row.Error; err != nil {
 		return 0

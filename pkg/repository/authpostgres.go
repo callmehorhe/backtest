@@ -54,7 +54,7 @@ func (r *AuthPostgres) ConfirmUser(code string) error {
 
 func (r *AuthPostgres) ForgetPassword(email, phone, auth string) error {
 	var user models.User
-	if err := r.db.Table("users").Where("email=? AND phone=?", email, phone).Scan(&user).Error; err != nil {
+	if err := r.db.Table("users").Where("email=? AND phone=?", email, phone).Take(&user).Error; err != nil {
 		return err
 	}
 	user.Password = ""

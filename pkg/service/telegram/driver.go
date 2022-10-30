@@ -52,6 +52,7 @@ func (b *Bot) HandleMessgeFromDriver(message *tgbotapi.Message, driver *models.D
 		b.HandleCommandDriver(message, driver)
 		return
 	}
+	
 	if message.Text != "" {
 		b.HandleTextDriver(message, driver)
 	}
